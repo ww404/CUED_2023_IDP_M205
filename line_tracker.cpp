@@ -1,54 +1,57 @@
-// function: track white lines and turn or keep followinging the line when there is a intersection
+/* Notes to Bram: pins select using only numbers are digital pins, pins selected using A followed by a number are analogue pins
+Void before a function basically tell the program to not run the function at that point, allowing you to define a function for use later
+bool left defines left as a boolian function that can only be true or false.
+
+*/
+
+// From the motor sample code, pre-setup
+#include <Adafruit_MotorShield.h>
+
+// Create the motor shield object with the default I2C address
+Adafruit_MotorShield AFMS = Adafruit_MotorShield();
+// Or, create it with a different I2C address (say for stacking)
+// Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x61);
+
+// Select which 'port' M1, M2, M3 or M4. In this case, M1
+Adafruit_DCMotor *Motor_L = AFMS.getMotor(1);
+// You can also make another motor on port M2
+Adafruit_DCMotor Motor_R = AFMS.getMotor(2);
 
 
-int leftlinesensorPin_1 = 2;
-int rightlinesensorPin_1 = 3; // Connect sensor to input pin 3
-
-int leftlinesensorPin_2 = 4;
-int rightlinesensorPin_2 = 5; // Connect sensor to input pin 3
 
 
-// defining functions here
+// Function: track white lines and turn or keep following the line when there is a intersection
 
-// this is a function telling it to move forward until line detector notices smth different
 
+int leftlinesensorPin = 2; // Connect left line sensor to input pin 2
+int rightlinesensorPin = 3; // Connect right line sensor to input pin 3
+
+
+// This is a function telling it to move forward until the line detector notices something different
+
+// Moving forward??? --> I'm (Bram) going to assume you mean left
 void TurnLeft (bool left){
     while (left) {
-  uint8_t i;
 
-  myMotor->run(FORWARD);
-  myOtherMotor->run(BACKWARD);
-  for (i=0; i<255; i++) {
-    myMotor->setSpeed(255*0.3);
-    myOtherMotor->setSpeed(255);
-    delay(10);
-  }
-  for (i=255; i!=0; i--) {
-    myMotor->setSpeed(255*0.3);
-    myOtherMotor->setSpeed(255);
-    delay(10);
-  }
+        Motor_L->run(FORWARD);
+        Motor_R->run(FORWARD);
+        Motor_L->setSpeed(255);
+        Motor_R->setSpeed(255);
     }
+    // Delay needs to be determined, probably by trial and error to ensure a turn of ~90 degrees
+    delay(10);
 }
 
 
-// turning left 
+// Turning left??? --> I'm (Bram) going to assume you mean forward
 void MoveForward (bool stop){
     while (!stop) {
-  uint8_t i;
+        // motor speeds not corrected for the different running speeds on the motors on the current prototype (#1)
 
-  myMotor->run(FORWARD);
-  myOtherMotor->run(BACKWARD);
-  for (i=0; i<255; i++) {
-    myMotor->setSpeed(255);
-    myOtherMotor->setSpeed(255);
-    delay(10);
-  }
-  for (i=255; i!=0; i--) {
-    myMotor->setSpeed(255);
-    myOtherMotor->setSpeed(255);
-    delay(10);
-  }
+        Motor_L->run(FORWARD);
+        Motor_R->run(BACKWARD);
+        Motor_L->setSpeed(255);
+        Motor_R->setSpeed(255);
     }
 }
 
@@ -56,51 +59,61 @@ void MoveForward (bool stop){
 
 void setup() {
 
-
-
 // setup for line_sensors
 Serial.begin(9600); // Init the serial port
-pinMode(leftlinesensorPin_1, INPUT); // declare LED as output
-pinMode(rightlinesensorPin_1, INPUT); // declare Micro switch as input
-
-pinMode(leftlinesensorPin_2, INPUT); // declare LED as output
-pinMode(rightlinesensorPin_2, INPUT); // declare Micro switch as input 
-
+pinMode(leftlinesensorPin, INPUT); // declares left linesensor as an input
+pinMode(rightlinesensorPin, INPUT); // declares right linesensor as an input
 
 
 
 
 // copying the setup for motors
   Serial.begin(9600);           // set up Serial library at 9600 bps
-  Serial.println("Adafruit Motorshield v2 - DC Motor test!");
+  Serial.println("Adafruit Motorshield v2 - Motors and line detector test");
+
 
   if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
   // if (!AFMS.begin(1000)) {  // OR with a different frequency, say 1KHz
     Serial.println("Could not find Motor Shield. Check wiring.");
     while (1);
   }
+
+
   Serial.println("Motor Shield found.");
 
-  // Set the speed to start, from 0 (off) to 255 (max speed)
-  myMotor->setSpeed(60);
-  myOtherMotor->setSpeed(150);
-  myMotor->run(FORWARD);
-  myOtherMotor->run(BACKWARD);
+
+
+  // Set the speed to start, from 0 (off) to 255 (max speed), set to 255 to start the robot moving
+  Motor_L->setSpeed(255);
+  Motor_R->setSpeed(255);
+  Motor_L->run(FORWARD);
+  Motor_R->run(BACKWARD);
   // turn on motor
-  myMotor->run(RELEASE);
-  myOtherMotor->run(RELEASE);
+  Motor_L->run(RELEASE);
+  Motor_R->run(RELEASE);
 
 }
 
 
 
 void loop(){
-int valLeft_1 = digitalRead(leftlinesensorPin_1); // read left input value
-int valLeft_2 = digitalRead(leftlinesensorPin_2); 
+
+// Commented out extra input readings as I (Bram) don't think they are needed, i.e each sensor only has one input pin.
+// Also correct for the previous change made witht regard to sensor input by removing the _1 from both "active sensors"
+
+
+int valLeft_1 = digitalRead(leftlinesensorPin); // read left input value
+//int valLeft_2 = digitalRead(leftlinesensorPin_2); 
 // Serial.print(valLeft_1);
-int valRight_1 = digitalRead(rightlinesensorPin_1); // read right input value
-int valRight_2 = digitalRead(rightlinesensorPin_2); 
+int valRight_1 = digitalRead(rightlinesensorPin); // read right input value
+//int valRight_2 = digitalRead(rightlinesensorPin_2); 
+
+
 // Serial.println(valRight_1); delay(100); // prinln starts a new line after the output
+
+
+/*
+I'm (Bram) not entirely sure about this, it's probably coirrect but I've written an alternative below so wehave two things to test
 
 stop = (! valRight_2 == valRight_1)
 turn_left = (valRight_2 == HIGH)
@@ -113,4 +126,28 @@ else if (valRight_1 == HIGH) {
     //turn left 90 degrees and then go straight
     TurnLeft(turn_left)
 }
+
+*/
+
+
+if (valLeft_1 == HIGH) {
+    Motor_R->setSpeed(255)
+    Motor_L->spetSpeed(127)
+    Delay(10)
+
+    //Again modify the delay as required to achieve a suitable amount of rotation
+}
+
+if (valLeft_2 == HIGH) {
+    Motor_L->setSpeed(255)
+    Motor_R->spetSpeed(127)
+    Delay(10)
+
+    // Same as above
+}
+
+else {
+    MoveForward(stop)
+}
+
 }
