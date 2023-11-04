@@ -39,6 +39,7 @@ void setup() {
   myMotor->run(RELEASE);
   myOtherMotor->run(RELEASE);
 }
+}
 
 void loop() {
   uint8_t i;
