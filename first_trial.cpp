@@ -28,12 +28,14 @@ Junction_Zero = (LineSensor_Left ==1, LineSensor_Right == 1, LineSensor_Center =
 //      Junction_Zero can also be the same as when turning back from junction five
 Junction_Five = (LineSensor_Left ==1, LineSensor_Right == 1, LineSensor_Center == 0)
 
+bool Found_Block, Magnetic;
+
 // Junctions:
-// Junction 5: Turn_Right_count ==0, Turn_Left_count ==0, Ignore_Turn == 0 and Junction_Five == True
-// Junction 4: Turn_Right_count ==1, Turn_Left_count ==0, Ignore_Turn == 0 and Junction_Right == True
-// Junction 3: Turn_Right_count ==1, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == True
-// Junction 2: Turn_Right_count ==2, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == True
-// Junction 1: Turn_Right_count ==3, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == True
+// Junction 5: Turn_Right_count ==0, Turn_Left_count ==0, Ignore_Turn == 0 and Junction_Five == true
+// Junction 4: Turn_Right_count ==1, Turn_Left_count ==0, Ignore_Turn == 0 and Junction_Right == true
+// Junction 3: Turn_Right_count ==1, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == true
+// Junction 2: Turn_Right_count ==2, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == true
+// Junction 1: Turn_Right_count ==3, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == true
 
 // counts
 Pass_Zero = 0;
@@ -41,32 +43,47 @@ Blocks = 0;
 Turn_Left_count = 0;
 Turn_Right_count = 0;
 Ignore_Turn = 0;
+Total_Junction = Turn_Left_count + Turn_Right_count + Ignore_Turn;
 
 // What is going to happen IDEALLY:
- while(not Straight and not Straight_Ignore){
+ while(Blocks == 0){
 
-    if (Junction_Zero == True) {
-        Pass_Zero = Pass_Zero + 1
+    if (Junction_Zero == True and Pass_Zero == 0) {
+        Pass_Zero = Pass_Zero + 1;
         MoveForward;
     }
           
-    if (Junction_Five == True){
+    if (Junction_Five == True and Pass_Zero == 1){ // at Junction 5
         TurnRight(angles = 90);
         Turn_Right_count = Turn_Right_count + 1;
         MoveForward;
     }
 
-    if (Junction_Right == True){
-        Ignore_Turn = Ignore_Turn + 1
+    if (Junction_Right == True and Total_Junction == 1){ // at Junction 4
+        Ignore_Turn = Ignore_Turn + 1;
         MoveForward;
     }
 
-    if (Junction_Right == True){
+    if (Junction_Right == True and Total_Junction == 2){ // at Junction 3
         Turn_Right_count = Turn_Right_count + 1;
-        TurnRight;
+        TurnRight(angles = 90);
         MoveForward;
     }
-    Junction_Right == True
-    MoveForward
 
+    if (Junction_Right == True and Total_Junction == 3){ // at Junction 2
+        Turn_Right_count = Turn_Right_count + 1;
+        TurnRight(angles = 90);
+        MoveForward;
+    }
+
+    if (Junction_Right == True and Total_Junction == 4){ // at Junction 1
+        Ignore_Turn = Ignore_Turn + 1;
+        MoveForward;
+    }
+
+    if (Junction_Zero == True and Pass_Zero == 1) { // at Junction 0 return
+        Pass_Zero = Pass_Zero + 1;
+        TurnLeft(angles = 90);
+        MoveForward;
+    }
 }
