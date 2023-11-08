@@ -1,4 +1,3 @@
-
 #include "functions.h"
 // logic for junctions and normally turning
 // functions we are using:
