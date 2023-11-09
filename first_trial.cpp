@@ -50,40 +50,76 @@ Total_Junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
 
     if (Junction_Zero == True and Total_Junction == 0) {
         Pass_Zero = Pass_Zero + 1;
-        MoveForward;
+        MoveForward();
     }
           
     if (Junction_Five == True and Total_Junction == 1){ // at Junction 5
         TurnRight(angles = 90);
         Turn_Right_count = Turn_Right_count + 1;
-        MoveForward;
+        MoveForward();
     }
 
     if (Junction_Right == True and Total_Junction == 2){ // at Junction 4
         Ignore_Turn = Ignore_Turn + 1;
-        MoveForward;
+        MoveForward();
     }
 
     if (Junction_Right == True and Total_Junction == 3){ // at Junction 3
         Turn_Right_count = Turn_Right_count + 1;
         TurnRight(angles = 90);
-        MoveForward;
+        MoveForward();
     }
 
     if (Junction_Right == True and Total_Junction == 4){ // at Junction 2
         Turn_Right_count = Turn_Right_count + 1;
         TurnRight(angles = 90);
-        MoveForward;
+        MoveForward();
     }
 
     if (Junction_Right == True and Total_Junction == 5){ // at Junction 1
         Ignore_Turn = Ignore_Turn + 1;
-        MoveForward;
+        MoveForward();
     }
 
-    if (Junction_Zero == True and Pass_Zero == 1) { // at Junction 0 return
+    if (Junction_Zero == True and Total_Junction == 6 ) { // at Junction 0 return
         Pass_Zero = Pass_Zero + 1;
         TurnLeft(angles = 90);
-        MoveForward;
+        MoveForward();
+    }
+
+    if (Junction_Zero == True and Total_Junction == 6 ) { // at the starting point
+        if(Magnetic){
+            TurnRight(angles = 90);
+        }
+        else{
+            TurnLeft(angles = 90);
+        }
+        MoveForward();
+    }
+
+    if (Junction_Five == True and Total_Junction == 7 ) { // at one of those colorful boxes
+        Total_Junction = Total_Junction + 1;
+        MoveForward();
+        delay(100);
+        Stop();
+        Reverse(delay = 2000);
+        TurnLeft(angles = 180);
+        MoveForward();
+    }
+
+    if (Junction_Five == True and Total_Junction == 8 ) { // back in origin
+        if(Magnetic){
+            TurnLeft(angels = 90);
+        }
+        else{
+            TurnRight(angles = 90);
+        }
+        Blocks = 1;
     }
 }
+
+Pass_Zero = 0;
+Turn_Left_count = 0;
+Turn_Right_count = 0;
+Ignore_Turn = 0;
+Total_Junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
