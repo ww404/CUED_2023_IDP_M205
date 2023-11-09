@@ -43,40 +43,40 @@ Blocks = 0;
 Turn_Left_count = 0;
 Turn_Right_count = 0;
 Ignore_Turn = 0;
-Total_Junction = Turn_Left_count + Turn_Right_count + Ignore_Turn;
+Total_Junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
 
 // What is going to happen IDEALLY:
  while(Blocks == 0){
 
-    if (Junction_Zero == True and Pass_Zero == 0) {
+    if (Junction_Zero == True and Total_Junction == 0) {
         Pass_Zero = Pass_Zero + 1;
         MoveForward;
     }
           
-    if (Junction_Five == True and Pass_Zero == 1){ // at Junction 5
+    if (Junction_Five == True and Total_Junction == 1){ // at Junction 5
         TurnRight(angles = 90);
         Turn_Right_count = Turn_Right_count + 1;
         MoveForward;
     }
 
-    if (Junction_Right == True and Total_Junction == 1){ // at Junction 4
+    if (Junction_Right == True and Total_Junction == 2){ // at Junction 4
         Ignore_Turn = Ignore_Turn + 1;
         MoveForward;
     }
 
-    if (Junction_Right == True and Total_Junction == 2){ // at Junction 3
+    if (Junction_Right == True and Total_Junction == 3){ // at Junction 3
         Turn_Right_count = Turn_Right_count + 1;
         TurnRight(angles = 90);
         MoveForward;
     }
 
-    if (Junction_Right == True and Total_Junction == 3){ // at Junction 2
+    if (Junction_Right == True and Total_Junction == 4){ // at Junction 2
         Turn_Right_count = Turn_Right_count + 1;
         TurnRight(angles = 90);
         MoveForward;
     }
 
-    if (Junction_Right == True and Total_Junction == 4){ // at Junction 1
+    if (Junction_Right == True and Total_Junction == 5){ // at Junction 1
         Ignore_Turn = Ignore_Turn + 1;
         MoveForward;
     }
