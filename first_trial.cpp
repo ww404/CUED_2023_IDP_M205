@@ -16,6 +16,11 @@
 //      Blue for indicating moving
 //      White for illuminating the line-sensors
 
+int valLeft = digitalRead(leftlinesensorPin); // read left input value
+int valRight = digitalRead(rightlinesensorPin); // read right input value
+int valCenter_left = digitalRead(centerlinesensorPin_left); 
+int valCenter_right = digitalRead(centerlinesensorPin_right); 
+
 // Actions:
 //      boolean values:
 Straight = (LineSensor_Left ==0, LineSensor_Right == 0, LineSensor_Center == 1)

@@ -4,9 +4,9 @@ Adafruit_DCMotor *Motor_L = AFMS.getMotor(1);
 Adafruit_DCMotor *Motor_R = AFMS.getMotor(2);
 
 
-int leftlinesensorPin = 3;
-int rightlinesensorPin = 4; 
-int centerlinesensorPin_left = 2;
+int leftlinesensorPin = 2;
+int rightlinesensorPin = 3; 
+int centerlinesensorPin_left = 4;
 int centerlinesensorPin_right = 5;
 
 
