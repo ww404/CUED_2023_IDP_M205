@@ -93,11 +93,12 @@ int valLeft_1 = digitalRead(leftlinesensorPin); // read left input value
 int valRight_1 = digitalRead(rightlinesensorPin); // read right input value
 int valCenter = digitalRead(centerlinesensorPin); 
 
-while (valCenter == LOW){
+if (valCenter == HIGH){
 
 if (valRight_1 == HIGH) {
     Motor_R->setSpeed(255);
     Motor_L->setSpeed(127*0.54);
+    delay(100);
 
     //Again modify the delay as required to achieve a suitable amount of rotation
 }
@@ -105,6 +106,7 @@ if (valRight_1 == HIGH) {
 else if (valLeft_1 == HIGH) {
     Motor_L->setSpeed(255*0.54);
     Motor_R->setSpeed(127);
+    delay(100);
 
 
     // Same as above
@@ -118,10 +120,18 @@ else {
 }
 
 }
-
+else if (valLeft_1 == LOW and valRight_1 == HIGH) {
   Motor_L->run(FORWARD);
   Motor_R->run(FORWARD);
   Motor_L->setSpeed(255*0.54);
   Motor_R->setSpeed(255);
   delay(1850); 
+}
+else if (valRight_1 == LOW and valLeft_1 == HIGH) {
+  Motor_R->run(FORWARD);
+  Motor_L->run(FORWARD);
+  Motor_R->setSpeed(255*0.54);
+  Motor_L->setSpeed(255);
+  delay(1850); 
+}
 }
