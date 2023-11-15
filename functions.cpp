@@ -2,6 +2,7 @@ void LineTracking(void){
     digitalWrite(led, HIGH);
     int valLeft_1 = digitalRead(leftlinesensorPin); // read left input value
     int valRight_1 = digitalRead(rightlinesensorPin); // read right input value
+    Blink();
 
     if (valRight_1 == HIGH) {
         Motor_R->setSpeed(255);
@@ -86,5 +87,5 @@ void Block (int val_Ultra, int val_Mag){
 }
  
 
-void Moving_Light
+void Blink(void);
 // flashes blue light when motors are moving

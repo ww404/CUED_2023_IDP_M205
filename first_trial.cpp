@@ -23,15 +23,12 @@ int valCenter_right = digitalRead(centerlinesensorPin_right);
 
 // Actions:
 //      boolean values:
-Straight = (LineSensor_Left ==0, LineSensor_Right == 0, LineSensor_Center == 1)
-Straight_Ignore = (LineSensor_Left == 0, LineSensor_Right == 0, LineSensor_Center == 0)
-Leaning_Right = (LineSensor_Left == 1, LineSensor_Right == 0, LineSensor_Center == 0)
-Leaning_Left = (LineSensor_Left == 0, LineSensor_Right == 1, LineSensor_Center == 0)
-Junction_Left = (LineSensor_Left == 1, LineSensor_Right == 0, LineSensor_Center == 1)
-Junction_Right = (LineSensor_Left == 0, LineSensor_Right == 1, LineSensor_Center == 1)
-Junction_Zero = (LineSensor_Left ==1, LineSensor_Right == 1, LineSensor_Center == 1) 
+Straight = (valLeft ==0, valRight == 0)
+Junction_Left = (valLeft == 1, valRight == 0, valCenter_left == 1, valCenter_left == 1)
+Junction_Right =  (valLeft == 0, valRight == 1, valCenter_left == 1, valCenter_left == 1)
+Junction_Zero = (valLeft == 1, valRight == 1, valCenter_left == 1, valCenter_left == 1) 
 //      Junction_Zero can also be the same as when turning back from junction five
-Junction_Five = (LineSensor_Left ==1, LineSensor_Right == 1, LineSensor_Center == 0)
+Junction_Five = (valLeft == 1, valRight == 0, valCenter_left == 0, valCenter_left == 1)
 
 bool Found_Block, Magnetic;
 
@@ -51,7 +48,7 @@ Ignore_Turn = 0;
 Total_Junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
 
 // What is going to happen IDEALLY:
- while(Blocks == 0){
+while(Blocks == 0){
 
     if (Junction_Zero == True and Total_Junction == 0) {
         Pass_Zero = Pass_Zero + 1;
@@ -62,6 +59,12 @@ Total_Junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
         TurnRight(angles = 90);
         Turn_Right_count = Turn_Right_count + 1;
         MoveForward();
+        if (Found_Block){
+            TurnLeft(180);
+            MoveForward();
+            delay(2000);
+            break;
+        }
     }
 
     if (Junction_Right == True and Total_Junction == 2){ // at Junction 4
