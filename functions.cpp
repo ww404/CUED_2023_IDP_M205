@@ -45,7 +45,7 @@ void MoveForward (void){
 void TurnLeft (int angles){
     Motor_L->run(FORWARD);
     Motor_R->run(FORWARD);
-    Motor_L->setSpeed(255*0.54*0.5); //Using 50/20 rmp motor correction
+    Motor_L->setSpeed(255*0.5); 
     Motor_R->setSpeed(255);
     delay(angles * 1850/90);  
 
@@ -54,7 +54,7 @@ void TurnLeft (int angles){
 void TurnRight (int angles){
     Motor_L->run(FORWARD);
     Motor_R->run(FORWARD);
-    Motor_L->setSpeed(255*0.54); //Using 50/20 rmp motor correction
+    Motor_L->setSpeed(255); 
     Motor_R->setSpeed(255*0.5);
     delay(angles * 1850/90);  
 }
@@ -63,7 +63,7 @@ void TurnRight (int angles){
 void Stop (){
     Motor_L->run(FORWARD);
     Motor_R->run(Forward);
-    Motor_L->setSpeed(0); //Using 50/20 rmp motor correction
+    Motor_L->setSpeed(0); 
     Motor_R->setSpeed(0);
 }
 
@@ -83,8 +83,64 @@ void Block (int val_Ultra, int val_Mag){
     // Clamps the clamp 
 
     Magnetic = digitalRead(MagInputPin);
+    int counter == 0;
+
+    #define MAX_RANG (520)//the max measurement value of the module is 520cm(a little bit longer than effective max range)
+    #define ADC_SOLUTION (1023.0)//ADC accuracy of Arduino UNO is 10bit
+
+    float distance_detected, block_distance;
+
+    // read the value from the sensor:
+    distance_detected = analogRead(ultrapin);
+    block_distance = distance_detected * MAX_RANG / ADC_SOLUTION;
+    if (block_distance <= 5){
+        Jaws(closed);
+
+        if (block_distance <= 1) {
+
+        // Gemma's code
+
+        
+            if (counter = 0) {
+                int magnetic = 0; // variable for reading the pin status
+
+                magnetic = digitalRead(inputPin); // read input value
+                if (val == HIGH) { // check if the input is HIGH
+                    digitalWrite(redPin, HIGH);
+                    delay(6000);
+                    digitalWrite(redPin, LOW); // turn red LED on
+                } 
+                
+                    else {
+                        digitalWrite(greenPin, HIGH);
+                        delay(6000); 
+                        digitalWrite(greenPin, LOW);// turn green LED on
+                    }
+
+                counter = 1
+            }
+
+        }
+}
+
+
+
+
+    }
 
 }
+
+void Jaws(bool closed){
+    #include <Servo.h>
+    Servo myservo; // create servo object to control a servo
+
+    int pos = 0; // variable to store the servo position
+    myservo.attach(9); // attaches the servo on pin 9 to the servo object
+    
+    closed_angle = 180
+    myservo.write(closed_angle); 
+}
+
  
 
 void Blink(void);

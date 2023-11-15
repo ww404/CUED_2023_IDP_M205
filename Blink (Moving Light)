@@ -1,0 +1,12 @@
+int bluePin = 10;
+
+void setup() {
+ pinMode(bluePin, OUTPUT); //declared LED as output
+}
+
+void loop() {
+    digitalWrite(bluePin, HIGH);
+    delay(250);
+    digitalWrite(bluePin, LOW);
+    delay(250);
+  }

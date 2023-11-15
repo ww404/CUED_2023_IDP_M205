@@ -1,0 +1,19 @@
+int redPin = 8; // choose the pin for the red LED
+int greenPin = 7; // choose the pin for the green LED
+int inputPin = 6; // choose the input pin
+int val = 0; // variable for reading the pin status
+void setup() {
+ pinMode(redPin, OUTPUT); // declare LED as output
+pinMode(greenPin, OUTPUT); // declare LED as output
+ pinMode(inputPin, INPUT); // declare magnetic sensor as input
+}
+void loop(){
+ val = digitalRead(inputPin); // read input value
+ if (val == HIGH) { // check if the input is HIGH
+ digitalWrite(redPin, HIGH);
+ digitalWrite(greenPin, LOW); // turn green LED on, red LED off
+ } else {
+ digitalWrite(redPin, LOW);
+ digitalWrite(greenPin, HIGH); // turn red LED on, green LED off
+ }
+}
