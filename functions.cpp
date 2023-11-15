@@ -82,6 +82,7 @@ void Block (int val_Ultra, int val_Mag){
     // Clamps the clamp 
 
     Magnetic = digitalRead(MagInputPin);
+    int counter == 0;
 
     #define MAX_RANG (520)//the max measurement value of the module is 520cm(a little bit longer than effective max range)
     #define ADC_SOLUTION (1023.0)//ADC accuracy of Arduino UNO is 10bit
@@ -94,22 +95,30 @@ void Block (int val_Ultra, int val_Mag){
     if (block_distance <= 5){
         Jaws(closed);
 
-        // Gemma's code
-        int magnetic = 0; // variable for reading the pin status
-        void setup() {
-        pinMode(redPin, OUTPUT); // declare LED as output
-        pinMode(greenPin, OUTPUT); // declare LED as output
-        pinMode(inputPin, INPUT); // declare magnetic sensor as input
+        if (block_distance <= 1) {
 
-        magnetic = digitalRead(inputPin); // read input value
-        if (val == HIGH) { // check if the input is HIGH
-            digitalWrite(redPin, HIGH);
-            digitalWrite(greenPin, LOW); // turn green LED on, red LED off
-        } 
+        // Gemma's code
+
         
-        else {
-            digitalWrite(redPin, LOW);
-            digitalWrite(greenPin, HIGH); // turn red LED on, green LED off
+            if (counter = 0) {
+                int magnetic = 0; // variable for reading the pin status
+
+                magnetic = digitalRead(inputPin); // read input value
+                if (val == HIGH) { // check if the input is HIGH
+                    digitalWrite(redPin, HIGH);
+                    delay(6000);
+                    digitalWrite(redPin, LOW); // turn red LED on
+                } 
+                
+                    else {
+                        digitalWrite(greenPin, HIGH);
+                        delay(6000); 
+                        digitalWrite(greenPin, LOW);// turn green LED on
+                    }
+
+                counter = 1
+            }
+
         }
 }
 
