@@ -16,6 +16,11 @@
 //      Blue for indicating moving
 //      White for illuminating the line-sensors
 
+int leftlinesensorPin = 2;
+int rightlinesensorPin = 3;
+int centerlinesensorPin_left = 4;
+int centerlinesensorPin_right = 5;
+
 void setup() {
   Serial.begin(9600);           // set up Serial library at 9600 bps
   Serial.println("Adafruit Motorshield v2 - DC Motor test!");
@@ -35,9 +40,16 @@ void setup() {
   // turn on motor
   Motor_R->run(RELEASE);
   Motor_L->run(RELEASE);
+
+  pinMode(leftlinesensorPin, INPUT);
+  pinMode(rightlinesensorPin, INPUT);
+  pinMode(centerlinesensorPin_left, INPUT);
+  pinMode(centerlinesensorPin_right, INPUT);
 }
 
 
+
+void loop(){
 int valLeft = digitalRead(leftlinesensorPin); // read left input value
 int valRight = digitalRead(rightlinesensorPin); // read right input value
 int valCenter_left = digitalRead(centerlinesensorPin_left); 
@@ -68,7 +80,7 @@ Ignore_Turn = 0;
 Total_Junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
 
 // What is going to happen IDEALLY:
-void loop(){
+
 if(Blocks == 0){
 
     if (Junction_Zero == True and Total_Junction == 0) {
