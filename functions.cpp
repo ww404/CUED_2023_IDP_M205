@@ -2,7 +2,6 @@ void LineTracking(void){
     digitalWrite(led, HIGH);
     int valLeft_1 = digitalRead(leftlinesensorPin); // read left input value
     int valRight_1 = digitalRead(rightlinesensorPin); // read right input value
-    Blink();
 
     if (valRight_1 == HIGH) {
         Motor_R->setSpeed(255);
@@ -117,18 +116,18 @@ void Block (int val_Ultra, int val_Mag){
                         digitalWrite(greenPin, LOW);// turn green LED on
                     }
 
-                counter = 1
+            counter = 1
             }
 
         }
-}
-
-
-
-
     }
 
+
+
+
 }
+
+
 
 void Jaws(bool closed){
     #include <Servo.h>
@@ -143,5 +142,13 @@ void Jaws(bool closed){
 
  
 
-void Blink(void);
-// flashes blue light when motors are moving
+void Moving_Light() {
+
+// Megan's code - flashing blue light, use function when robot is moving.
+
+    digitalWrite(bluePin, HIGH);
+    delay(250);
+    digitalWrite(bluePin, LOW);
+    delay(250);
+
+}
