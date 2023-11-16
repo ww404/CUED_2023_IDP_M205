@@ -3,37 +3,48 @@ int valRight = digitalRead(rightlinesensorPin); // read right input value
 int valCenter_left = digitalRead(centerlinesensorPin_left); 
 int valCenter_right = digitalRead(centerlinesensorPin_right); 
 
-bool Found_Block, Magnetic;
-bool Straight = valLeft ==0 && valRight == 0;
-bool Junction_Left = valLeft == 1 && valRight == 0 && valCenter_left == 1 && valCenter_left == 1;
-bool Junction_Right =  valLeft == 0 && valRight == 1 && valCenter_left == 1 && valCenter_left == 1;
-bool Junction_Zero = valLeft == 1 && valRight == 1 && valCenter_left == 1 && valCenter_left == 1;
-bool Junction_Five = valLeft == 1 && valRight == 0 && valCenter_left == 0 && valCenter_left == 1;
+int Magnetic;
+int stop_LED = 0;
+
+
+bool Found_Block;
+bool Straight = (valLeft ==0 && valRight == 0);
+bool Junction_Left = (valLeft == 1 && valRight == 0 && valCenter_left == 1 && valCenter_left == 1);
+bool Junction_Right =  (valLeft == 0 && valRight == 1 && valCenter_left == 1 && valCenter_left == 1);
+bool Junction_Zero = (valLeft == 1 && valRight == 1 && valCenter_left == 1 && valCenter_left == 1);
+bool Junction_Five = (valLeft == 1 && valRight == 0 && valCenter_left == 0 && valCenter_left == 1);
 
 int Pass_Zero, Blocks, Turn_Left_count, Turn_Right_count, Ignore_Turn, Total_Junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
 
+
 void LineTracking(void){
+
+// after testing the four_sensors_line_tracking code, can change all this into that tracking code.
     digitalWrite(led, HIGH);
     int valLeft_1 = digitalRead(leftlinesensorPin); // read left input value
     int valRight_1 = digitalRead(rightlinesensorPin); // read right input value
 
     if (valRight_1 == HIGH) {
+        Motor_L->run(FORWARD);
+        Motor_R->run(FORWARD);
         Motor_R->setSpeed(255);
-        Motor_L->setSpeed(127*0.54);
+        Motor_L->setSpeed(255*0.54);
 
     //Again modify the delay as required to achieve a suitable amount of rotation
     }
 
     else if (valLeft_1 == HIGH) {
+        Motor_L->run(FORWARD);
+        Motor_R->run(FORWARD);        
         Motor_L->setSpeed(255*0.54);
-        Motor_R->setSpeed(127);
+        Motor_R->setSpeed(255);
 
 
     // Same as above
     }
 
     else {
-        Motor_L->run(BACKWARD);
+        Motor_L->run(FORWARD);
         Motor_R->run(FORWARD);
         Motor_L->setSpeed(255*0.54);
         Motor_R->setSpeed(255);
@@ -96,7 +107,6 @@ void Block (int val_Ultra, int val_Mag){
     // Clamps the clamp 
 
     Magnetic = digitalRead(MagInputPin);
-    int counter == 0;
 
     #define MAX_RANG (520)//the max measurement value of the module is 520cm(a little bit longer than effective max range)
     #define ADC_SOLUTION (1023.0)//ADC accuracy of Arduino UNO is 10bit
@@ -104,8 +114,8 @@ void Block (int val_Ultra, int val_Mag){
     float distance_detected, block_distance;
 
     // read the value from the sensor:
-    distance_detected = analogRead(ultrapin);
-    block_distance = distance_detected * MAX_RANG / ADC_SOLUTION;
+    int distance_detected = analogRead(ultrapin);
+    double block_distance = distance_detected * MAX_RANG / ADC_SOLUTION;
     if (block_distance <= 5){
         Jaws(closed);
 
@@ -114,23 +124,23 @@ void Block (int val_Ultra, int val_Mag){
         // Gemma's code
 
         
-            if (counter = 0) {
+            if (stop_LED = 0) {
                 int magnetic = 0; // variable for reading the pin status
 
                 magnetic = digitalRead(inputPin); // read input value
-                if (val == HIGH) { // check if the input is HIGH
+                if (magnetic == HIGH) { // check if the input is HIGH
                     digitalWrite(redPin, HIGH);
                     delay(6000);
                     digitalWrite(redPin, LOW); // turn red LED on
                 } 
                 
-                    else {
-                        digitalWrite(greenPin, HIGH);
-                        delay(6000); 
-                        digitalWrite(greenPin, LOW);// turn green LED on
-                    }
+                else {
+                    digitalWrite(greenPin, HIGH);
+                    delay(6000); 
+                    digitalWrite(greenPin, LOW);// turn green LED on
+                }
 
-            counter = 1
+            stop_LED = 1
             }
 
         }
