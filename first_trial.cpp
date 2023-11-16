@@ -16,6 +16,28 @@
 //      Blue for indicating moving
 //      White for illuminating the line-sensors
 
+void setup() {
+  Serial.begin(9600);           // set up Serial library at 9600 bps
+  Serial.println("Adafruit Motorshield v2 - DC Motor test!");
+
+  if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
+  // if (!AFMS.begin(1000)) {  // OR with a different frequency, say 1KHz
+    Serial.println("Could not find Motor Shield. Check wiring.");
+    while (1);
+  }
+  Serial.println("Motor Shield found.");
+
+  // Set the speed to start, from 0 (off) to 255 (max speed)
+  Motor_R->setSpeed(255);
+  Motor_L->setSpeed(255);
+  Motor_R->run(FORWARD);
+  Motor_L->run(FORWARD);
+  // turn on motor
+  Motor_R->run(RELEASE);
+  Motor_L->run(RELEASE);
+}
+
+
 int valLeft = digitalRead(leftlinesensorPin); // read left input value
 int valRight = digitalRead(rightlinesensorPin); // read right input value
 int valCenter_left = digitalRead(centerlinesensorPin_left); 
@@ -23,18 +45,16 @@ int valCenter_right = digitalRead(centerlinesensorPin_right);
 
 // Actions:
 //      boolean values:
-Straight = (valLeft ==0, valRight == 0)
-Junction_Left = (valLeft == 1, valRight == 0, valCenter_left == 1, valCenter_left == 1)
-Junction_Right =  (valLeft == 0, valRight == 1, valCenter_left == 1, valCenter_left == 1)
-Junction_Zero = (valLeft == 1, valRight == 1, valCenter_left == 1, valCenter_left == 1) 
-//      Junction_Zero can also be the same as when turning back from junction five
-Junction_Five = (valLeft == 1, valRight == 0, valCenter_left == 0, valCenter_left == 1)
-
 bool Found_Block, Magnetic;
+bool Straight = valLeft ==0 && valRight == 0;
+bool Junction_Left = valLeft == 1 && valRight == 0 && valCenter_left == 1 && valCenter_left == 1;
+bool Junction_Right =  valLeft == 0 && valRight == 1 && valCenter_left == 1 && valCenter_left == 1;
+bool Junction_Zero = valLeft == 1 && valRight == 1 && valCenter_left == 1 && valCenter_left == 1;
+bool Junction_Five = valLeft == 1 && valRight == 0 && valCenter_left == 0 && valCenter_left == 1;
 
 // Junctions:
-// Junction 5: Turn_Right_count ==0, Turn_Left_count ==0, Ignore_Turn == 0 and Junction_Five == true
-// Junction 4: Turn_Right_count ==1, Turn_Left_count ==0, Ignore_Turn == 0 and Junction_Right == true
+// Junction 5 = Turn_Right_count ==0 && Turn_Left_count ==0 && Ignore_Turn == 0 && Junction_Five == true;
+// Junction 4 = Turn_Right_count ==1 && Turn_Left_count ==0 && Ignore_Turn == 0 && Junction_Right == true;
 // Junction 3: Turn_Right_count ==1, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == true
 // Junction 2: Turn_Right_count ==2, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == true
 // Junction 1: Turn_Right_count ==3, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == true
@@ -48,7 +68,8 @@ Ignore_Turn = 0;
 Total_Junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
 
 // What is going to happen IDEALLY:
-while(Blocks == 0){
+void loop(){
+if(Blocks == 0){
 
     if (Junction_Zero == True and Total_Junction == 0) {
         Pass_Zero = Pass_Zero + 1;
@@ -125,7 +146,7 @@ while(Blocks == 0){
         Blocks = 1;
     }
 }
-
+}
 Pass_Zero = 0;
 Turn_Left_count = 0;
 Turn_Right_count = 0;

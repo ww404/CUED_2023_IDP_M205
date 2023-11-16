@@ -1,3 +1,17 @@
+int valLeft = digitalRead(leftlinesensorPin); // read left input value
+int valRight = digitalRead(rightlinesensorPin); // read right input value
+int valCenter_left = digitalRead(centerlinesensorPin_left); 
+int valCenter_right = digitalRead(centerlinesensorPin_right); 
+
+bool Found_Block, Magnetic;
+bool Straight = valLeft ==0 && valRight == 0;
+bool Junction_Left = valLeft == 1 && valRight == 0 && valCenter_left == 1 && valCenter_left == 1;
+bool Junction_Right =  valLeft == 0 && valRight == 1 && valCenter_left == 1 && valCenter_left == 1;
+bool Junction_Zero = valLeft == 1 && valRight == 1 && valCenter_left == 1 && valCenter_left == 1;
+bool Junction_Five = valLeft == 1 && valRight == 0 && valCenter_left == 0 && valCenter_left == 1;
+
+int Pass_Zero, Blocks, Turn_Left_count, Turn_Right_count, Ignore_Turn, Total_Junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
+
 void LineTracking(void){
     digitalWrite(led, HIGH);
     int valLeft_1 = digitalRead(leftlinesensorPin); // read left input value
