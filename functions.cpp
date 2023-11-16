@@ -43,7 +43,7 @@ void MoveForward (void){
 
 void TurnLeft (int angles){
     Motor_L->run(FORWARD);
-    Motor_R->run(FORWARD);
+    Motor_R->run(BACKWARD);
     Motor_L->setSpeed(255*0.5); 
     Motor_R->setSpeed(255);
     delay(angles * 1850/90);  
@@ -51,7 +51,7 @@ void TurnLeft (int angles){
 }
 
 void TurnRight (int angles){
-    Motor_L->run(FORWARD);
+    Motor_L->run(BACKWARD);
     Motor_R->run(FORWARD);
     Motor_L->setSpeed(255); 
     Motor_R->setSpeed(255*0.5);
@@ -61,14 +61,14 @@ void TurnRight (int angles){
 
 void Stop (){
     Motor_L->run(FORWARD);
-    Motor_R->run(Forward);
+    Motor_R->run(FORWARD);
     Motor_L->setSpeed(0); 
     Motor_R->setSpeed(0);
 }
 
 void Reverse (){
-    Motor_L->run(Backward);
-    Motor_R->run(Forward);
+    Motor_L->run(BACKWARD);
+    Motor_R->run(BACKWARD);
     Motor_L->setSpeed(255);
     Motor_R->spetSpeed(255);
 
@@ -135,8 +135,12 @@ void Jaws(bool closed){
 
     int pos = 0; // variable to store the servo position
     myservo.attach(9); // attaches the servo on pin 9 to the servo object
+    if (closed){
+        closed_angle = 180;
+    }else {
+        closed_angle = 0;
+    }
     
-    closed_angle = 180
     myservo.write(closed_angle); 
 }
 
