@@ -67,7 +67,6 @@ void LineTracking(int valLeft, int valRight, int valCenter_left, int valCenter_r
 
 if (valLeft == LOW && valRight == LOW){
 
-
   if (valCenter_left == LOW && valCenter_right == HIGH) {
     Motor_L->run(FORWARD);
     Motor_R->run(FORWARD);  
@@ -95,24 +94,10 @@ if (valLeft == LOW && valRight == LOW){
   }
 }
 
-
-
-if (valLeft == HIGH) {
-    if (valRight == HIGH){
-        TurnRight(90, speed);
-    }else {
-        TurnLeft(90, speed);
-    }
-    }
-else if (valLeft == LOW and valRight == HIGH) {
-    TurnRight(90, speed);
-}
-
 }
     
 
 void MoveForward(int valLeft, int valRight, int valCenter_left, int valCenter_right, int speed){
-
   //dist_t = sensity_t * MAX_RANG / ADC_SOLUTION;
   LineTracking(valLeft, valRight, valCenter_left, valCenter_right, speed);
 
@@ -248,41 +233,39 @@ void Moving_Light() {
 
 }
 
-
 void setup() {
-  Serial.begin(9600);           // set up Serial library at 9600 bps
-  Serial.println("Adafruit Motorshield v2 - DC Motor test!");
 
-  if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
+// setup for line_sensors
+Serial.begin(9600); // Init the serial port
+pinMode(leftlinesensorPin, INPUT); // declares left linesensor as an input
+pinMode(rightlinesensorPin, INPUT); // declares right linesensor as an input
+pinMode(centerlinesensorPin_left, INPUT);
+pinMode(centerlinesensorPin_right, INPUT);
+
+// copying the setup for motors
+Serial.begin(9600);           // set up Serial library at 9600 bps
+Serial.println("Adafruit Motorshield v2 - Motors and line detector test");
+
+
+if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
   // if (!AFMS.begin(1000)) {  // OR with a different frequency, say 1KHz
     Serial.println("Could not find Motor Shield. Check wiring.");
     while (1);
-  }
+}
+  Serial.println("Motor Shield found.");
 
 
 
-  // Set the speed to start, from 0 (off) to 255 (max speed)
-  Motor_R->setSpeed(255);
-  Motor_L->setSpeed(255);
-  Motor_R->run(FORWARD);
+  // Set the speed to start, from 0 (off) to 255 (max speed), set to 255 to start the robot moving
   Motor_L->run(FORWARD);
+  Motor_R->run(BACKWARD);  
+  Motor_L->setSpeed(0);
+  Motor_R->setSpeed(0);
+
   // turn on motor
-  Motor_R->run(RELEASE);
   Motor_L->run(RELEASE);
+  Motor_R->run(RELEASE);
 
-  pinMode(leftlinesensorPin, INPUT);
-  pinMode(rightlinesensorPin, INPUT);
-  pinMode(centerlinesensorPin_left, INPUT);
-  pinMode(centerlinesensorPin_right, INPUT);
-
-  int Pass_Zero = 0;
-  int Blocks = 0;
-  int Turn_Left_count = 0;
-  int Turn_Right_count = 0;
-  int Ignore_Turn = 0;
-  int Total_Junction = 0;
-  int Total_junction;
-  extern int angles;
 }
 
 
@@ -292,16 +275,17 @@ void loop(){
   int valRight = digitalRead(rightlinesensorPin); // read right input value
   int valCenter_left = digitalRead(centerlinesensorPin_left); 
   int valCenter_right = digitalRead(centerlinesensorPin_right); 
+    speed = 180;
 
   int Pass_Zero, Blocks, Turn_Left_count, Turn_Right_count, Ignore_Turn, Total_Junction, Total_junction;
   // Actions:
   //      boolean values:
   bool Found_Block, Magnetic;
-  bool Straight = valLeft ==0 && valRight == 0;
-  bool Junction_Left = valLeft == 1 && valRight == 0 && valCenter_left == 1 && valCenter_right == 1;
-  bool Junction_Right =  valLeft == 0 && valRight == 1 && valCenter_left == 1 && valCenter_right == 1;
-  bool Junction_Zero = valLeft == 1 && valRight == 1 && valCenter_left == 1 && valCenter_right == 1;
-  bool Junction_Five = valLeft == 1 && valRight == 1 && valCenter_left == 0 && valCenter_right == 0;
+  bool Straight = (valLeft ==0 && valRight == 0);
+  bool Junction_Left = (valLeft == 1 && valRight == 0 && valCenter_left == 1 && valCenter_right == 1);
+  bool Junction_Right =  (valLeft == 0 && valRight == 1 && valCenter_left == 1 && valCenter_right == 1);
+  bool Junction_Zero = (valLeft == 1 && valRight == 1 && valCenter_left == 1 && valCenter_right == 1);
+  bool Junction_Five = (valLeft == 1 && valRight == 1 && valCenter_left == 0 && valCenter_right == 0);
 
 // Junctions:
 // Junction 5 = Turn_Right_count ==0 && Turn_Left_count ==0 && Ignore_Turn == 0 && Junction_Five == true;
@@ -310,7 +294,7 @@ void loop(){
 // Junction 2: Turn_Right_count ==2, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == true
 // Junction 1: Turn_Right_count ==3, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == true
 
-// counts
+
 Total_junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
 
 // What is going to happen IDEALLY:
@@ -396,6 +380,8 @@ Total_junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
     else {
         MoveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
     }
+    
+    LineTracking(valLeft, valRight, valCenter_left, valCenter_right, speed);
   }
 //}
 
