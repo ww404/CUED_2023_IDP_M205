@@ -1,0 +1,187 @@
+#include "C:\Users\BramH\Documents\Arduino\Functions_Corrected\Functions_Corrected.ino"
+#include <Adafruit_MotorShield.h>
+#define MAX_RANG (520)//the max measurement value of the module is 520cm(a little bit longer than effective max range)
+#define  ADC_SOLUTION
+// logic for junctions and normally turning
+// functions we are using:
+//      MoveForward     moves forward until deteects a block, and calls function Block
+//      Block           when a block has been found, detect and shine LED and clamp it together (all that jazzzzzz)
+//      TurnLeft and TurnRight      turns 90 degrees or until some sensor changes 
+// sensors we are using
+//      LineSensor_Left, LineSensor_Right, LineSensor_Center
+//      MagneticSensor
+//      UltraSonicSensor
+// motors we are using
+//      MotorLeft and MotorRight
+//      Servor (for clampling block)
+// LEDs we are using
+//      Red and Green for testing magnetic
+//      Blue for indicating moving
+//      White for illuminating the line-sensors
+
+
+extern int leftlinesensorPin; 
+extern int rightlinesensorPin; 
+extern int centerlinesensorPin_left;
+extern int centerlinesensorPin_right;
+extern int MagInputPin;
+extern int sensityPin ;
+extern int greenLEDpin;
+extern int redLEDpin;
+extern int blueLEDpin;
+
+
+extern Adafruit_MotorShield AFMS;
+extern Adafruit_DCMotor *Motor_L;
+extern Adafruit_DCMotor *Motor_R;
+
+
+
+void setup() {
+  Serial.begin(9600);           // set up Serial library at 9600 bps
+  Serial.println("Adafruit Motorshield v2 - DC Motor test!");
+
+  if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
+  // if (!AFMS.begin(1000)) {  // OR with a different frequency, say 1KHz
+    Serial.println("Could not find Motor Shield. Check wiring.");
+    while (1);
+  }
+
+
+
+  // Set the speed to start, from 0 (off) to 255 (max speed)
+  Motor_R->setSpeed(255);
+  Motor_L->setSpeed(255);
+  Motor_R->run(FORWARD);
+  Motor_L->run(FORWARD);
+  // turn on motor
+  Motor_R->run(RELEASE);
+  Motor_L->run(RELEASE);
+
+  pinMode(leftlinesensorPin, INPUT);
+  pinMode(rightlinesensorPin, INPUT);
+  pinMode(centerlinesensorPin_left, INPUT);
+  pinMode(centerlinesensorPin_right, INPUT);
+
+  int Pass_Zero = 0;
+  int Blocks = 0;
+  int Turn_Left_count = 0;
+  int Turn_Right_count = 0;
+  int Ignore_Turn = 0;
+  int Total_Junction = 0;
+  extern int angles;
+}
+
+
+
+void loop(){
+  int valLeft = digitalRead(leftlinesensorPin); // read left input value
+  int valRight = digitalRead(rightlinesensorPin); // read right input value
+  int valCenter_left = digitalRead(centerlinesensorPin_left); 
+  int valCenter_right = digitalRead(centerlinesensorPin_right); 
+
+  // Actions:
+  //      boolean values:
+  bool Found_Block, Magnetic;
+  bool Straight = valLeft ==0 && valRight == 0;
+  bool Junction_Left = valLeft == 1 && valRight == 0 && valCenter_left == 1 && valCenter_right == 1;
+  bool Junction_Right =  valLeft == 0 && valRight == 1 && valCenter_left == 1 && valCenter_right == 1;
+  bool Junction_Zero = valLeft == 1 && valRight == 1 && valCenter_left == 1 && valCenter_right == 1;
+  bool Junction_Five = valLeft == 1 && valRight == 1 && valCenter_left == 0 && valCenter_right == 0;
+
+// Junctions:
+// Junction 5 = Turn_Right_count ==0 && Turn_Left_count ==0 && Ignore_Turn == 0 && Junction_Five == true;
+// Junction 4 = Turn_Right_count ==1 && Turn_Left_count ==0 && Ignore_Turn == 0 && Junction_Right == true;
+// Junction 3: Turn_Right_count ==1, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == true
+// Junction 2: Turn_Right_count ==2, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == true
+// Junction 1: Turn_Right_count ==3, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == true
+
+// counts
+// Total_junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
+
+// What is going to happen IDEALLY:
+
+//if(Blocks == 0){
+
+    if (Junction_Zero == true and Total_Junction == 0) {
+        Pass_Zero = Pass_Zero + 1;
+        MoveForward();
+    }
+          
+    else if (Junction_Five == true and Total_Junction == 1){ // at Junction 5
+      TurnRight(90);
+      Turn_Right_count = Turn_Right_count + 1;
+      MoveForward();
+      //if (Found_Block){
+        //TurnLeft(180);
+        //MoveForward();
+        //delay(2000);
+      //break;
+      //}
+    }
+
+    else if (Junction_Right == true and Total_Junction == 2){ // at Junction 4
+        Ignore_Turn = Ignore_Turn + 1;
+        MoveForward();
+    }
+
+    else if (Junction_Right == true and Total_Junction == 3){ // at Junction 3
+        Turn_Right_count = Turn_Right_count + 1;
+        TurnRight(90);
+        MoveForward();
+    }
+
+    else if (Junction_Right == true and Total_Junction == 4){ // at Junction 2
+        Turn_Right_count = Turn_Right_count + 1;
+        TurnRight(90);
+        MoveForward();
+    }
+
+    else if (Junction_Right == true and Total_Junction == 5){ // at Junction 1
+        Ignore_Turn = Ignore_Turn + 1;
+        MoveForward();
+    }
+
+    else if (Junction_Zero == true and Total_Junction == 6 ) { // at Junction 0 return
+        Pass_Zero = Pass_Zero + 1;
+        TurnLeft(90);
+        MoveForward();
+    }
+
+    else if (Junction_Zero == true and Total_Junction == 6 ) { // at the starting point
+        if(Magnetic){
+            TurnRight(90);
+        }
+        else{
+            TurnLeft(90);
+        }
+        MoveForward();
+    }
+
+    else if (Junction_Five == true and Total_Junction == 7 ) { // at one of those colorful boxes
+        Total_Junction = Total_Junction + 1;
+        MoveForward();
+        delay(100);
+        Stop();
+        Reverse();
+        delay(2000);
+        TurnLeft(180);
+        MoveForward();
+    }
+
+    else if (Junction_Five == true and Total_Junction == 8 ) { // back in origin
+        if(Magnetic){
+            TurnLeft(90);
+        }
+        else{
+            TurnRight(90);
+        }
+        Blocks = 1;
+    }
+
+    else {
+        MoveForward();
+    }
+  }
+//}
+
