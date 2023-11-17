@@ -15,7 +15,7 @@ void TurnLeft (void){
     Motor_R->run(FORWARD);
     Motor_L->setSpeed(255);
     Motor_R->setSpeed(255);
-    delay(1850); 
+    delay(1000); 
     }
 
 void TurnRight (void){
@@ -23,7 +23,7 @@ void TurnRight (void){
     Motor_R->run(BACKWARD);
     Motor_L->setSpeed(255);
     Motor_R->setSpeed(255);
-    delay(1850); 
+    delay(1000); 
     }
 
 void MoveForward (bool stop){
