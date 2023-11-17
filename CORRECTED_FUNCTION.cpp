@@ -91,8 +91,7 @@ else if (valLeft == LOW and valRight == HIGH) {
 }
 
 }
-    }
-}
+    
 
 void MoveForward(void){
 

@@ -1,4 +1,5 @@
-#include "C:\Users\BramH\Documents\Arduino\Functions_Corrected\Functions_Corrected.ino"
+//#include "C:\Users\BramH\Documents\Arduino\Functions_Corrected\Functions_Corrected.ino"
+#include "/Users/v.w./Desktop/cambridge/IB/LAB/IDP/CUED_2023_IDP_M205/CORRECTED_FUNCTION"
 #include <Adafruit_MotorShield.h>
 #define MAX_RANG (520)//the max measurement value of the module is 520cm(a little bit longer than effective max range)
 #define  ADC_SOLUTION
