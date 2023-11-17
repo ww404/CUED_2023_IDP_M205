@@ -5,9 +5,9 @@ Adafruit_DCMotor *Motor_R = AFMS.getMotor(2);
 
 
 int leftlinesensorPin = 2;
-int rightlinesensorPin = 5; 
-int centerlinesensorPin_left = 3;
-int centerlinesensorPin_right = 4;
+int rightlinesensorPin = 3; 
+int centerlinesensorPin_left = 4;
+int centerlinesensorPin_right = 5;
 
 
 void TurnLeft (void){
@@ -88,8 +88,8 @@ if (valLeft == LOW && valRight == LOW){
   if (valCenter_left == LOW && valCenter_right == HIGH) {
     Motor_L->run(FORWARD);
     Motor_R->run(FORWARD);  
-    Motor_R->setSpeed(255*0.5);
-    Motor_L->setSpeed(255);
+    Motor_L->setSpeed(255*0.5);
+    Motor_R->setSpeed(255);
 
     //Again modify the delay as required to achieve a suitable amount of rotation
   } 
@@ -97,8 +97,8 @@ if (valLeft == LOW && valRight == LOW){
   else if (valCenter_right == LOW && valCenter_left == HIGH) {
     Motor_L->run(FORWARD);
     Motor_R->run(FORWARD);  
-    Motor_L->setSpeed(255*0.5);
-    Motor_R->setSpeed(255);
+    Motor_R->setSpeed(255*0.5);
+    Motor_L->setSpeed(255);
 
 
     // Same as above
