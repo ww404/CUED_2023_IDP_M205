@@ -266,6 +266,14 @@ if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
   Motor_L->run(RELEASE);
   Motor_R->run(RELEASE);
 
+  int Pass_Zero = 0;
+  int Blocks = 0;
+  int Turn_Left_count = 0;
+  int Turn_Right_count = 0;
+  int Ignore_Turn = 0;
+  int Total_Junction = 0;
+  extern int angles;
+
 }
 
 
