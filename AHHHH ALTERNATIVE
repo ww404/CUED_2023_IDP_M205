@@ -91,6 +91,9 @@
     }
   }
 
+
+int counter = 0;
+
 void setup() {
   Serial.begin(9600);           // set up Serial library at 9600 bps
   Serial.println("Adafruit Motorshield v2 - DC Motor test!");
@@ -122,6 +125,7 @@ void setup() {
   pinMode (greenLEDpin, OUTPUT);
   pinMode (redLEDpin, OUTPUT);
   pinMode (blueLEDpin, OUTPUT);
+  
 
 }
 
@@ -136,9 +140,10 @@ void loop(){
   int block_distance = sensity_t * MAX_RANG / ADC_SOLUTION;
   int speed = 180;
 
+
   // BUTTON PRESS CODE REQUIRED
 
-  while (block_distance >= 10){
+  while (block_distance >= 10 || counter == 1){
     sensity_t = analogRead(sensityPin);
     block_distance = sensity_t * MAX_RANG / ADC_SOLUTION; //
     //Serial.println(block_distance);
@@ -176,19 +181,22 @@ void loop(){
   Motor_R->setSpeed(0);
   Motor_L->setSpeed(0);
 
-  //if (counter == 0){
-  // read input value
+  if (counter == 0){
+    counter = 1;
     
 
-  if (Magnetic == HIGH) { // check if the input is HIGH
-    digitalWrite(redLEDpin, HIGH);
-    delay(6000);
-    digitalWrite(redLEDpin, LOW); // turn red LED on
-  } 
+    if (Magnetic == HIGH) { // check if the input is HIGH
+      digitalWrite(redLEDpin, HIGH);
+      delay(6000);
+      digitalWrite(redLEDpin, LOW); // turn red LED on
+      return counter;
+    } 
       
-  else {
-    digitalWrite(greenLEDpin, HIGH);
-    delay(6000); 
-    digitalWrite(greenLEDpin, LOW);// turn green LED on
+    else {
+      digitalWrite(greenLEDpin, HIGH);
+      delay(6000); 
+      digitalWrite(greenLEDpin, LOW);// turn green LED on
+      return counter;
+    }
   }
 }
