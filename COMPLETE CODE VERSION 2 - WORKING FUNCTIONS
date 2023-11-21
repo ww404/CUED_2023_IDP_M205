@@ -1,4 +1,4 @@
-//#include "C:\Users\BramH\Documents\Arduino\Functions_Corrected\Functions_Corrected.ino"
+ //#include "C:\Users\BramH\Documents\Arduino\Functions_Corrected\Functions_Corrected.ino"
 #include <Adafruit_MotorShield.h>
 #define MAX_RANG (520)//the max measurement value of the module is 520cm(a little bit longer than effective max range)
 #define  ADC_SOLUTION
@@ -58,6 +58,49 @@ float dist_t;
 
 
 int LineTracking(){
+
+
+int valCenter_left = digitalRead(centerlinesensorPin_left); 
+int valCenter_right = digitalRead(centerlinesensorPin_right); 
+int speed = 180;
+
+  
+
+// after testing the four_sensors_line_tracking code, can change all this into that tracking code.
+
+
+
+
+if (valCenter_left == HIGH && valCenter_right == LOW) {
+  Motor_L->run(FORWARD);
+  Motor_R->run(FORWARD);  
+  Motor_L->setSpeed(speed*0.8);
+  Motor_R->setSpeed(speed);
+  //Again modify the delay as required to achieve a suitable amount of rotation
+} 
+
+else if (valCenter_left == LOW && valCenter_right == HIGH) {
+  Motor_L->run(FORWARD);
+  Motor_R->run(FORWARD);  
+  Motor_R->setSpeed(speed*0.8);
+  Motor_L->setSpeed(speed);
+  // Same as above
+}  
+  
+
+
+  else {
+    Motor_L->run(FORWARD);
+    Motor_R->run(FORWARD);  
+    Motor_R->setSpeed(speed);
+    Motor_L->setSpeed(speed);
+  }
+}
+
+
+
+
+int LineTrackingandTurning(){
   int valLeft = digitalRead(leftlinesensorPin);
   int valRight = digitalRead(rightlinesensorPin); // read right input value
   int valCenter_left = digitalRead(centerlinesensorPin_left); 
@@ -139,43 +182,34 @@ int MoveForward(){
 
 int TurnLeft (){
 
-    int valCenter_left = digitalRead(centerlinesensorPin_left); 
-    int valCenter_right = digitalRead(centerlinesensorPin_right); 
-    int corner_speed = 120;
-    int speed = 180;
+  int valCenter_left = digitalRead(centerlinesensorPin_left); 
+  int valCenter_right = digitalRead(centerlinesensorPin_right); 
+  int valLeft = digitalRead(leftlinesensorPin);
+  int corner_speed = 120;
+  int speed = 180;
 
+  Motor_L->run(BACKWARD);
+  Motor_R->run(FORWARD);
+  Motor_L->setSpeed(corner_speed); 
+  Motor_R->setSpeed(corner_speed);
+  delay(1000);
+
+  valCenter_left = digitalRead(centerlinesensorPin_left);
+  valCenter_right = digitalRead(centerlinesensorPin_right); 
+  valLeft = digitalRead(leftlinesensorPin); 
+
+  while ((valCenter_left == LOW && valCenter_right == LOW) || valLeft == LOW) {
+    valCenter_left = digitalRead(centerlinesensorPin_left); 
+    valCenter_right = digitalRead(centerlinesensorPin_right);
+    valLeft = digitalRead(leftlinesensorPin); 
     Motor_L->run(BACKWARD);
     Motor_R->run(FORWARD);
     Motor_L->setSpeed(corner_speed); 
     Motor_R->setSpeed(corner_speed);
-    delay(1000);
+  }
 
-    valCenter_left = digitalRead(centerlinesensorPin_left);
-    valCenter_right = digitalRead(centerlinesensorPin_right); 
-
-    while (valCenter_right == LOW || valCenter_left == HIGH) {
-      valCenter_left = digitalRead(centerlinesensorPin_left); 
-      valCenter_right = digitalRead(centerlinesensorPin_right); 
-      Motor_L->run(BACKWARD);
-      Motor_R->run(FORWARD);
-      Motor_L->setSpeed(corner_speed); 
-      Motor_R->setSpeed(corner_speed);
-    }
-
-    while (valCenter_right == LOW || valCenter_left == LOW) {
-      valCenter_left = digitalRead(centerlinesensorPin_left); 
-      valCenter_right = digitalRead(centerlinesensorPin_right); 
-      Motor_L->run(FORWARD);
-      Motor_R->run(BACKWARD);
-      Motor_L->setSpeed(corner_speed); 
-      Motor_R->setSpeed(corner_speed);
-    }
-
-    Motor_L->run(FORWARD);
-    Motor_R->run(FORWARD);  
-    Motor_R->setSpeed(speed);
-    Motor_L->setSpeed(speed);
-    delay(1000);
+  LineTracking();
+  delay(137.96);
       
 
 }
@@ -183,6 +217,7 @@ int TurnLeft (){
 int TurnRight (){
     int valCenter_left = digitalRead(centerlinesensorPin_left); 
     int valCenter_right = digitalRead(centerlinesensorPin_right); 
+    int valRight = digitalRead(rightlinesensorPin);
     int corner_speed = 120;
     int speed = 180;
 
@@ -194,30 +229,20 @@ int TurnRight (){
 
     valCenter_left = digitalRead(centerlinesensorPin_left);
     valCenter_right = digitalRead(centerlinesensorPin_right); 
+    valRight = digitalRead(rightlinesensorPin); 
 
-    while (valCenter_left == LOW || valCenter_right == HIGH) {
+    while ((valCenter_left == LOW && valCenter_right == LOW) || valRight == LOW) {
       valCenter_left = digitalRead(centerlinesensorPin_left); 
-      valCenter_right = digitalRead(centerlinesensorPin_right); 
+      valCenter_right = digitalRead(centerlinesensorPin_right);
+      valRight = digitalRead(rightlinesensorPin); 
       Motor_L->run(FORWARD);
       Motor_R->run(BACKWARD);
       Motor_L->setSpeed(corner_speed); 
       Motor_R->setSpeed(corner_speed);
     }
 
-    while (valCenter_left == LOW || valCenter_right == LOW) {
-    valCenter_left = digitalRead(centerlinesensorPin_left); 
-    valCenter_right = digitalRead(centerlinesensorPin_right);       
-    Motor_L->run(BACKWARD);
-    Motor_R->run(FORWARD);
-    Motor_L->setSpeed(corner_speed); 
-    Motor_R->setSpeed(corner_speed);
-    }
-
-    Motor_L->run(FORWARD);
-    Motor_R->run(FORWARD);  
-    Motor_R->setSpeed(speed);
-    Motor_L->setSpeed(speed);
-    delay(1000);  
+    LineTracking();
+    delay(137.96);  
 }
 
 
@@ -397,7 +422,7 @@ void loop(){
   // turn on motor
   
 
-  LineTracking();
+  LineTrackingandTurning();
 
   /*
   if(Blocks == 0){
