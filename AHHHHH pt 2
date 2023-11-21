@@ -172,8 +172,8 @@ int MoveForward(){
   int speed = 180;
   float dist_t;
   dist_t = sensity_t * MAX_RANG / ADC_SOLUTION;
-  Block();
-  while (dist_t >= 5) {
+  //Block();
+  while (dist_t <= 1) {
     sensity_t = analogRead(sensityPin);
     dist_t = sensity_t * MAX_RANG / ADC_SOLUTION;
 
@@ -205,11 +205,27 @@ int MoveForward(){
       Motor_L->setSpeed(speed);
     }
   }
-  } 
+  
+
+
+  if (valLeft == HIGH) {
+    if (valRight == HIGH){
+    TurnRight();
+    }  
+
+    else {
+      TurnLeft();
+    }
+  }
+
+  if (valLeft == LOW && valRight == HIGH) {
+    TurnRight();
+  }
+  }
+  
  // else {
    //LineTracking();
  // }
-  
 }
 // if angles = 90, then it turns exactly 90 degrees to the left or right
 // else, it is correcting not following lines and turns until it is Straight again
@@ -449,7 +465,6 @@ void loop(){
   int valCenter_left = digitalRead(centerlinesensorPin_left); 
   int valCenter_right = digitalRead(centerlinesensorPin_right); 
   float sensity_t = analogRead(sensityPin);
-  
   float dist_t = sensity_t * MAX_RANG / ADC_SOLUTION;
   // Actions:
   //      boolean values:
