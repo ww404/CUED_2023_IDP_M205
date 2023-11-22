@@ -157,74 +157,72 @@ void loop(){
   }
 
   if (button_counter ==1) {
-
     while (block_distance >= 10 || counter == 1){
       if (Junction_Zero == true && Total_Junction == 0) {
-      Total_Junction = 1;
-      sensity_t = analogRead(sensityPin);
-      block_distance = sensity_t * MAX_RANG / ADC_SOLUTION; //
-      if (valCenter_left == HIGH && valCenter_right == LOW) {
-        Motor_L->run(FORWARD);
-        Motor_R->run(FORWARD);  
-        Motor_L->setSpeed(speed*0.8);
-        Motor_R->setSpeed(speed);
-      } 
+        Total_Junction = 1;
+        sensity_t = analogRead(sensityPin);
+        block_distance = sensity_t * MAX_RANG / ADC_SOLUTION; //
+        if (valCenter_left == HIGH && valCenter_right == LOW) {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_L->setSpeed(speed*0.8);
+          Motor_R->setSpeed(speed);
+        } 
 
-      else if (valCenter_left == LOW && valCenter_right == HIGH) {
-        Motor_L->run(FORWARD);
-        Motor_R->run(FORWARD);  
-        Motor_R->setSpeed(speed*0.8);
-        Motor_L->setSpeed(speed);
-      }  
+        else if (valCenter_left == LOW && valCenter_right == HIGH) {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed*0.8);
+          Motor_L->setSpeed(speed);
+        }  
   
-      else {
-        Motor_L->run(FORWARD);
-        Motor_R->run(FORWARD);  
-        Motor_R->setSpeed(speed);
-        Motor_L->setSpeed(speed);
+        else {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed);
+          Motor_L->setSpeed(speed);
+        }
       }
-    }
             
-    else if (Junction_Five == true and Total_Junction == 1){ // at Junction 5
-      TurnRight();
-      Total_Junction = 2;
-      //if (Found_Block){
-        //TurnLeft(180);
-        //MoveForward();
-        //delay(2000);
-      //break;
-      //}
-    }
-
-    else if (Junction_Right == true and Total_Junction == 2){ // at Junction 4
+      else if (Junction_Five == true and Total_Junction == 1){ // at Junction 5
+        TurnRight();
+        Total_Junction = 2;
+        /*if (Found_Block){
+          //TurnLeft(180);
+          //MoveForward();
+          //delay(2000);
+        //break;
+        */}
+    
+      else if (Junction_Right == true and Total_Junction == 2){ // at Junction 4
         Total_Junction = 3;
         MoveForward();
-    }
+      }
 
-    else if (Junction_Right == true and Total_Junction == 3){ // at Junction 3
+      else if (Junction_Right == true and Total_Junction == 3){ // at Junction 3
         Total_Junction = 4;
         TurnRight(90, speed);
         MoveForward();
-    }
+      }
 
-    else if (Junction_Right == true and Total_Junction == 4){ // at Junction 2
+      else if (Junction_Right == true and Total_Junction == 4){ // at Junction 2
         Total_Junction = 5;
         TurnRight(90, speed);
         MoveForward();
-    }
+      }
 
-    else if (Junction_Right == true and Total_Junction == 5){ // at Junction 1
+      else if (Junction_Right == true and Total_Junction == 5){ // at Junction 1
         Total_Junction = 6;
         MoveForward();
-    }
+      }
 
-    else if (Junction_Zero == true and Total_Junction == 6 ) { // at Junction 0 return
+      else if (Junction_Zero == true and Total_Junction == 6 ) { // at Junction 0 return
         Total_Junction = 7;
         TurnLeft(90, speed);
         MoveForward();
-    }
+      }
 
-    else if (Junction_Zero == true and Total_Junction == 6 ) { // at the starting point
+      else if (Junction_Zero == true and Total_Junction == 6 ) { // at the starting point
         if(Magnetic){
             TurnRight();
         }
@@ -233,9 +231,9 @@ void loop(){
         }
         MoveForward();
         Total_Junction = 7;
-    }
+      }
 
-    else if (Junction_Five == true and Total_Junction == 7 ) { // at one of those colorful boxes
+      else if (Junction_Five == true and Total_Junction == 7 ) { // at one of those colorful boxes
         Total_Junction = 8;
         MoveForward();
         delay(100);
@@ -244,9 +242,9 @@ void loop(){
         delay(2000);
         TurnLeft(180, speed);
         MoveForward();
-    }
+      }
 
-    else if (Junction_Five == true and Total_Junction == 8 ) { // back in origin
+      else if (Junction_Five == true and Total_Junction == 8 ) { // back in origin
         if(Magnetic){
             TurnLeft(90, speed);
         }
@@ -254,36 +252,33 @@ void loop(){
             TurnRight(90, speed);
         }
         Blocks = 1;
+      }
+
+      else {
+        MoveForward();
+      }
     }
-
-    else {
-    MoveForward();
-    }
-  }
-
-  
-  Motor_L->run(FORWARD);
-  Motor_R->run(FORWARD);  
-  Motor_R->setSpeed(0);
-  Motor_L->setSpeed(0);
-
-  if (counter == 0){
-    counter = 1;
+    Motor_L->run(FORWARD);
+    Motor_R->run(FORWARD);  
+    Motor_R->setSpeed(0);
+    Motor_L->setSpeed(0);
+    if (counter == 0){
+      counter = 1;
     
 
-    if (Magnetic == HIGH) { // check if the input is HIGH
-      digitalWrite(redLEDpin, HIGH);
-      delay(6000);
-      digitalWrite(redLEDpin, LOW); // turn red LED on
-      return counter;
-    } 
+      if (Magnetic == HIGH) { // check if the input is HIGH
+        digitalWrite(redLEDpin, HIGH);
+        delay(6000);
+        digitalWrite(redLEDpin, LOW); // turn red LED on
+        return counter;
+      } 
       
-    else {
-      digitalWrite(greenLEDpin, HIGH);
-      delay(6000); 
-      digitalWrite(greenLEDpin, LOW);// turn green LED on
-      return counter;
+      else {
+        digitalWrite(greenLEDpin, HIGH);
+        delay(6000); 
+        digitalWrite(greenLEDpin, LOW);// turn green LED on
+        return counter;
+      }
     }
-  }
   }
 }
