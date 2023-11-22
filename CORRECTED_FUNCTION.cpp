@@ -2,11 +2,11 @@
 #define MAX_RANG (520)//the max measurement value of the module is 520cm(a little bit longer than effective max range)
 #define  ADC_SOLUTION (1023.0)
 
-int leftlinesensorPin = 2; 
-int rightlinesensorPin = 3; 
-int centerlinesensorPin_left = 4;
-int centerlinesensorPin_right = 5;
-int MagInputPin = 6;
+int leftLineSensorPin = 2; 
+int rightLineSensorPin = 3; 
+int centerLineSensorPin_Left = 4;
+int centerLineSensorPin_Right = 5;
+int magInputPin = 6;
 int sensityPin = A3;
 int greenLEDpin = 7;
 int redLEDpin = 8;
@@ -19,14 +19,14 @@ Adafruit_DCMotor *Motor_R = AFMS.getMotor(2);
 
 
 
-int valLeft = digitalRead(leftlinesensorPin); // read left input value
-int valRight = digitalRead(rightlinesensorPin); // read right input value
-int valCenter_left = digitalRead(centerlinesensorPin_left); 
-int valCenter_right = digitalRead(centerlinesensorPin_right);
+int valLeft = digitalRead(leftLineSensorPin); // read left input value
+int valRight = digitalRead(rightLineSensorPin); // read right input value
+int valCenter_left = digitalRead(centerLineSensorPin_Left); 
+int valCenter_right = digitalRead(centerLineSensorPin_Right);
 float sensity_t = analogRead(sensityPin);
 float dist_t;
 
-int Magnetic = digitalRead(MagInputPin);
+int Magnetic = digitalRead(magInputPin);
 int stop_LED = 0;
 
 int speed = 180;
@@ -93,7 +93,7 @@ else if (valLeft == LOW and valRight == HIGH) {
 }
     
 
-void MoveForward(void){
+void moveForward(void){
 
   dist_t = sensity_t * MAX_RANG / ADC_SOLUTION;
   LineTracking();
@@ -160,7 +160,7 @@ void Block (void){
   // Flashes the LED light
   // Clamps the clamp 
 
-  Magnetic = digitalRead(MagInputPin);
+  Magnetic = digitalRead(magInputPin);
 
   float block_distance;
 

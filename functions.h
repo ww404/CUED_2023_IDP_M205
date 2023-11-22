@@ -1,7 +1,7 @@
-int valLeft = digitalRead(leftlinesensorPin); // read left input value
-int valRight = digitalRead(rightlinesensorPin); // read right input value
-int valCenter_left = digitalRead(centerlinesensorPin_left); 
-int valCenter_right = digitalRead(centerlinesensorPin_right); 
+int valLeft = digitalRead(leftLineSensorPin); // read left input value
+int valRight = digitalRead(rightLineSensorPin); // read right input value
+int valCenter_left = digitalRead(centerLineSensorPin_Left); 
+int valCenter_right = digitalRead(centerLineSensorPin_Right); 
 
 int Magnetic;
 int stop_LED = 0;
@@ -21,8 +21,8 @@ void LineTracking(void){
 
 // after testing the four_sensors_line_tracking code, can change all this into that tracking code.
     digitalWrite(led, HIGH);
-    int valLeft_1 = digitalRead(leftlinesensorPin); // read left input value
-    int valRight_1 = digitalRead(rightlinesensorPin); // read right input value
+    int valLeft_1 = digitalRead(leftLineSensorPin); // read left input value
+    int valRight_1 = digitalRead(rightLineSensorPin); // read right input value
 
     if (valRight_1 == HIGH) {
         Motor_L->run(FORWARD);
@@ -51,7 +51,7 @@ void LineTracking(void){
     }
 }
 
-void MoveForward (void){
+void moveForward (void){
 // This is going to be a function that 
 // 1. moves forward while correcting the mistakes by calling TurnRight or TurnLeft
 // 2. detects if there is a blck ahead and if so, calls function Block
@@ -106,7 +106,7 @@ void Block (int val_Ultra, int val_Mag){
     // Flashes the LED light
     // Clamps the clamp 
 
-    Magnetic = digitalRead(MagInputPin);
+    Magnetic = digitalRead(magInputPin);
 
     #define MAX_RANG (520)//the max measurement value of the module is 520cm(a little bit longer than effective max range)
     #define ADC_SOLUTION (1023.0)//ADC accuracy of Arduino UNO is 10bit

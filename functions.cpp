@@ -1,7 +1,7 @@
 void LineTracking(void){
     digitalWrite(led, HIGH);
-    int valLeft_1 = digitalRead(leftlinesensorPin); // read left input value
-    int valRight_1 = digitalRead(rightlinesensorPin); // read right input value
+    int valLeft_1 = digitalRead(leftLineSensorPin); // read left input value
+    int valRight_1 = digitalRead(rightLineSensorPin); // read right input value
 
     if (valRight_1 == HIGH) {
         Motor_R->setSpeed(255);
@@ -26,7 +26,7 @@ void LineTracking(void){
     }
 }
 
-void MoveForward (void){
+void moveForward (void){
 // This is going to be a function that 
 // 1. moves forward while correcting the mistakes by calling TurnRight or TurnLeft
 // 2. detects if there is a blck ahead and if so, calls function Block
@@ -81,7 +81,7 @@ void Block (int val_Ultra, int val_Mag){
     // Flashes the LED light
     // Clamps the clamp 
 
-    Magnetic = digitalRead(MagInputPin);
+    Magnetic = digitalRead(magInputPin);
     int counter == 0;
 
     #define MAX_RANG (520)//the max measurement value of the module is 520cm(a little bit longer than effective max range)

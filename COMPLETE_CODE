@@ -21,11 +21,11 @@
 //      White for illuminating the line-sensors
 
 
-extern int leftlinesensorPin; 
-extern int rightlinesensorPin; 
-extern int centerlinesensorPin_left;
-extern int centerlinesensorPin_right;
-extern int MagInputPin;
+extern int leftLineSensorPin; 
+extern int rightLineSensorPin; 
+extern int centerLineSensorPin_Left;
+extern int centerLineSensorPin_Right;
+extern int magInputPin;
 extern int sensityPin ;
 extern int greenLEDpin;
 extern int redLEDpin;
@@ -59,10 +59,10 @@ void setup() {
   Motor_R->run(RELEASE);
   Motor_L->run(RELEASE);
 
-  pinMode(leftlinesensorPin, INPUT);
-  pinMode(rightlinesensorPin, INPUT);
-  pinMode(centerlinesensorPin_left, INPUT);
-  pinMode(centerlinesensorPin_right, INPUT);
+  pinMode(leftLineSensorPin, INPUT);
+  pinMode(rightLineSensorPin, INPUT);
+  pinMode(centerLineSensorPin_Left, INPUT);
+  pinMode(centerLineSensorPin_Right, INPUT);
 
   int Pass_Zero = 0;
   int Blocks = 0;
@@ -76,10 +76,10 @@ void setup() {
 
 
 void loop(){
-  int valLeft = digitalRead(leftlinesensorPin); // read left input value
-  int valRight = digitalRead(rightlinesensorPin); // read right input value
-  int valCenter_left = digitalRead(centerlinesensorPin_left); 
-  int valCenter_right = digitalRead(centerlinesensorPin_right); 
+  int valLeft = digitalRead(leftLineSensorPin); // read left input value
+  int valRight = digitalRead(rightLineSensorPin); // read right input value
+  int valCenter_left = digitalRead(centerLineSensorPin_Left); 
+  int valCenter_right = digitalRead(centerLineSensorPin_Right); 
 
   // Actions:
   //      boolean values:

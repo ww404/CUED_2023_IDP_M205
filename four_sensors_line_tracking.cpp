@@ -4,10 +4,10 @@ Adafruit_DCMotor *Motor_L = AFMS.getMotor(1);
 Adafruit_DCMotor *Motor_R = AFMS.getMotor(2);
 
 
-int leftlinesensorPin = 2;
-int rightlinesensorPin = 3; 
-int centerlinesensorPin_left = 4;
-int centerlinesensorPin_right = 5;
+int leftLineSensorPin = 2;
+int rightLineSensorPin = 3; 
+int centerLineSensorPin_Left = 4;
+int centerLineSensorPin_Right = 5;
 
 
 void TurnLeft (void){
@@ -26,7 +26,7 @@ void TurnRight (void){
     delay(1000); 
     }
 
-void MoveForward (bool stop){
+void moveForward (bool stop){
     while (!stop) {
         // motor speeds not corrected for the different running speeds on the motors on the current prototype (#1)
 
@@ -43,10 +43,10 @@ void setup() {
 
 // setup for line_sensors
 Serial.begin(9600); // Init the serial port
-pinMode(leftlinesensorPin, INPUT); // declares left linesensor as an input
-pinMode(rightlinesensorPin, INPUT); // declares right linesensor as an input
-pinMode(centerlinesensorPin_left, INPUT);
-pinMode(centerlinesensorPin_right, INPUT);
+pinMode(leftLineSensorPin, INPUT); // declares left linesensor as an input
+pinMode(rightLineSensorPin, INPUT); // declares right linesensor as an input
+pinMode(centerLineSensorPin_Left, INPUT);
+pinMode(centerLineSensorPin_Right, INPUT);
 
 // copying the setup for motors
 Serial.begin(9600);           // set up Serial library at 9600 bps
@@ -78,10 +78,10 @@ if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
 
 void loop(){
 
-int valLeft = digitalRead(leftlinesensorPin); // read left input value
-int valRight = digitalRead(rightlinesensorPin); // read right input value
-int valCenter_left = digitalRead(centerlinesensorPin_left); 
-int valCenter_right = digitalRead(centerlinesensorPin_right); 
+int valLeft = digitalRead(leftLineSensorPin); // read left input value
+int valRight = digitalRead(rightLineSensorPin); // read right input value
+int valCenter_left = digitalRead(centerLineSensorPin_Left); 
+int valCenter_right = digitalRead(centerLineSensorPin_Right); 
 if (valLeft == LOW && valRight == LOW){
 
 

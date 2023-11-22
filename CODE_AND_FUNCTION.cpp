@@ -6,7 +6,7 @@
 #define  ADC_SOLUTION
 // logic for junctions and normally turning
 // functions we are using:
-//      MoveForward     moves forward until deteects a block, and calls function Block
+//      moveForward     moves forward until deteects a block, and calls function Block
 //      Block           when a block has been found, detect and shine LED and clamp it together (all that jazzzzzz)
 //      TurnLeft and TurnRight      turns 90 degrees or until some sensor changes 
 // sensors we are using
@@ -22,28 +22,28 @@
 //      White for illuminating the line-sensors
 
 
-extern int leftlinesensorPin; 
-extern int rightlinesensorPin; 
-extern int centerlinesensorPin_left;
-extern int centerlinesensorPin_right;
-extern int MagInputPin;
+extern int leftLineSensorPin; 
+extern int rightLineSensorPin; 
+extern int centerLineSensorPin_Left;
+extern int centerLineSensorPin_Right;
+extern int magInputPin;
 extern int sensityPin ;
 extern int greenLEDpin;
 extern int redLEDpin;
 extern int blueLEDpin;
 
-int valLeft = digitalRead(leftlinesensorPin); // read left input value
-int valRight = digitalRead(rightlinesensorPin); // read right input value
-int valCenter_left = digitalRead(centerlinesensorPin_left); 
-int valCenter_right = digitalRead(centerlinesensorPin_right);
+int valLeft = digitalRead(leftLineSensorPin); // read left input value
+int valRight = digitalRead(rightLineSensorPin); // read right input value
+int valCenter_left = digitalRead(centerLineSensorPin_Left); 
+int valCenter_right = digitalRead(centerLineSensorPin_Right);
 float sensity_t = analogRead(sensityPin);
 float dist_t;
 
-int leftlinesensorPin = 2; 
-int rightlinesensorPin = 3; 
-int centerlinesensorPin_left = 4;
-int centerlinesensorPin_right = 5;
-int MagInputPin = 6;
+int leftLineSensorPin = 2; 
+int rightLineSensorPin = 3; 
+int centerLineSensorPin_Left = 4;
+int centerLineSensorPin_Right = 5;
+int magInputPin = 6;
 int sensityPin = A3;
 int greenLEDpin = 7;
 int redLEDpin = 8;
@@ -53,7 +53,7 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *Motor_L = AFMS.getMotor(1);
 Adafruit_DCMotor *Motor_R = AFMS.getMotor(2);
 
-int Magnetic = digitalRead(MagInputPin);
+int Magnetic = digitalRead(magInputPin);
 int stop_LED = 0;
 
 int speed = 180;
@@ -97,7 +97,7 @@ if (valLeft == LOW && valRight == LOW){
 }
     
 
-void MoveForward(int valLeft, int valRight, int valCenter_left, int valCenter_right, int speed){
+void moveForward(int valLeft, int valRight, int valCenter_left, int valCenter_right, int speed){
   //dist_t = sensity_t * MAX_RANG / ADC_SOLUTION;
   LineTracking(valLeft, valRight, valCenter_left, valCenter_right, speed);
 
@@ -163,7 +163,7 @@ void Block (void){
   // Flashes the LED light
   // Clamps the clamp 
 
-  Magnetic = digitalRead(MagInputPin);
+  Magnetic = digitalRead(magInputPin);
 
   float block_distance;
 
@@ -237,10 +237,10 @@ void setup() {
 
 // setup for line_sensors
 Serial.begin(9600); // Init the serial port
-pinMode(leftlinesensorPin, INPUT); // declares left linesensor as an input
-pinMode(rightlinesensorPin, INPUT); // declares right linesensor as an input
-pinMode(centerlinesensorPin_left, INPUT);
-pinMode(centerlinesensorPin_right, INPUT);
+pinMode(leftLineSensorPin, INPUT); // declares left linesensor as an input
+pinMode(rightLineSensorPin, INPUT); // declares right linesensor as an input
+pinMode(centerLineSensorPin_Left, INPUT);
+pinMode(centerLineSensorPin_Right, INPUT);
 
 // copying the setup for motors
 Serial.begin(9600);           // set up Serial library at 9600 bps
@@ -279,10 +279,10 @@ if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
 
 
 void loop(){
-  int valLeft = digitalRead(leftlinesensorPin); // read left input value
-  int valRight = digitalRead(rightlinesensorPin); // read right input value
-  int valCenter_left = digitalRead(centerlinesensorPin_left); 
-  int valCenter_right = digitalRead(centerlinesensorPin_right); 
+  int valLeft = digitalRead(leftLineSensorPin); // read left input value
+  int valRight = digitalRead(rightLineSensorPin); // read right input value
+  int valCenter_left = digitalRead(centerLineSensorPin_Left); 
+  int valCenter_right = digitalRead(centerLineSensorPin_Right); 
     speed = 180;
 
   int Pass_Zero, Blocks, Turn_Left_count, Turn_Right_count, Ignore_Turn, Total_Junction, Total_junction;
@@ -311,16 +311,16 @@ Total_junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
 
     if (Junction_Zero == true and Total_Junction == 0) {
         Pass_Zero = Pass_Zero + 1;
-        MoveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
+        moveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
     }
           
     else if (Junction_Five == true and Total_Junction == 1){ // at Junction 5
       TurnRight(90, speed);
       Turn_Right_count = Turn_Right_count + 1;
-      MoveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
+      moveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
       //if (Found_Block){
         //TurnLeft(180);
-        //MoveForward();
+        //moveForward();
         //delay(2000);
       //break;
       //}
@@ -328,30 +328,30 @@ Total_junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
 
     else if (Junction_Right == true and Total_Junction == 2){ // at Junction 4
         Ignore_Turn = Ignore_Turn + 1;
-        MoveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
+        moveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
     }
 
     else if (Junction_Right == true and Total_Junction == 3){ // at Junction 3
         Turn_Right_count = Turn_Right_count + 1;
         TurnRight(90, speed);
-        MoveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
+        moveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
     }
 
     else if (Junction_Right == true and Total_Junction == 4){ // at Junction 2
         Turn_Right_count = Turn_Right_count + 1;
         TurnRight(90, speed);
-        MoveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
+        moveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
     }
 
     else if (Junction_Right == true and Total_Junction == 5){ // at Junction 1
         Ignore_Turn = Ignore_Turn + 1;
-        MoveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
+        moveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
     }
 
     else if (Junction_Zero == true and Total_Junction == 6 ) { // at Junction 0 return
         Pass_Zero = Pass_Zero + 1;
         TurnLeft(90, speed);
-        MoveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
+        moveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
     }
 
     else if (Junction_Zero == true and Total_Junction == 6 ) { // at the starting point
@@ -361,18 +361,18 @@ Total_junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
         else{
             TurnLeft(90, speed);
         }
-        MoveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
+        moveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
     }
 
     else if (Junction_Five == true and Total_Junction == 7 ) { // at one of those colorful boxes
         Total_Junction = Total_Junction + 1;
-        MoveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
+        moveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
         delay(100);
         Stop();
         Reverse(speed);
         delay(2000);
         TurnLeft(180, speed);
-        MoveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
+        moveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
     }
 
     else if (Junction_Five == true and Total_Junction == 8 ) { // back in origin
@@ -386,7 +386,7 @@ Total_junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
     }
 
     else {
-        MoveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
+        moveForward(valLeft, valRight, valCenter_left, valCenter_right, speed);
     }
     
     LineTracking(valLeft, valRight, valCenter_left, valCenter_right, speed);

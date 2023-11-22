@@ -1,7 +1,7 @@
 #include "functions.h"
 // logic for junctions and normally turning
 // functions we are using:
-//      MoveForward     moves forward until deteects a block, and calls function Block
+//      moveForward     moves forward until deteects a block, and calls function Block
 //      Block           when a block has been found, detect and shine LED and clamp it together (all that jazzzzzz)
 //      TurnLeft and TurnRight      turns 90 degrees or until some sensor changes 
 // sensors we are using
@@ -16,10 +16,10 @@
 //      Blue for indicating moving
 //      White for illuminating the line-sensors
 
-int leftlinesensorPin = 2;
-int rightlinesensorPin = 3;
-int centerlinesensorPin_left = 4;
-int centerlinesensorPin_right = 5;
+int leftLineSensorPin = 2;
+int rightLineSensorPin = 3;
+int centerLineSensorPin_Left = 4;
+int centerLineSensorPin_Right = 5;
 
 void setup() {
   Serial.begin(9600);           // set up Serial library at 9600 bps
@@ -41,19 +41,19 @@ void setup() {
   Motor_R->run(RELEASE);
   Motor_L->run(RELEASE);
 
-  pinMode(leftlinesensorPin, INPUT);
-  pinMode(rightlinesensorPin, INPUT);
-  pinMode(centerlinesensorPin_left, INPUT);
-  pinMode(centerlinesensorPin_right, INPUT);
+  pinMode(leftLineSensorPin, INPUT);
+  pinMode(rightLineSensorPin, INPUT);
+  pinMode(centerLineSensorPin_Left, INPUT);
+  pinMode(centerLineSensorPin_Right, INPUT);
 }
 
 
 
 void loop(){
-int valLeft = digitalRead(leftlinesensorPin); // read left input value
-int valRight = digitalRead(rightlinesensorPin); // read right input value
-int valCenter_left = digitalRead(centerlinesensorPin_left); 
-int valCenter_right = digitalRead(centerlinesensorPin_right); 
+int valLeft = digitalRead(leftLineSensorPin); // read left input value
+int valRight = digitalRead(rightLineSensorPin); // read right input value
+int valCenter_left = digitalRead(centerLineSensorPin_Left); 
+int valCenter_right = digitalRead(centerLineSensorPin_Right); 
 
 // Actions:
 //      boolean values:
@@ -85,16 +85,16 @@ if(Blocks == 0){
 
     if (Junction_Zero == True and Total_Junction == 0) {
         Pass_Zero = Pass_Zero + 1;
-        MoveForward();
+        moveForward();
     }
           
     if (Junction_Five == True and Total_Junction == 1){ // at Junction 5
         TurnRight(angles = 90);
         Turn_Right_count = Turn_Right_count + 1;
-        MoveForward();
+        moveForward();
         if (Found_Block){
             TurnLeft(180);
-            MoveForward();
+            moveForward();
             delay(2000);
             break;
         }
@@ -102,30 +102,30 @@ if(Blocks == 0){
 
     if (Junction_Right == True and Total_Junction == 2){ // at Junction 4
         Ignore_Turn = Ignore_Turn + 1;
-        MoveForward();
+        moveForward();
     }
 
     if (Junction_Right == True and Total_Junction == 3){ // at Junction 3
         Turn_Right_count = Turn_Right_count + 1;
         TurnRight(angles = 90);
-        MoveForward();
+        moveForward();
     }
 
     if (Junction_Right == True and Total_Junction == 4){ // at Junction 2
         Turn_Right_count = Turn_Right_count + 1;
         TurnRight(angles = 90);
-        MoveForward();
+        moveForward();
     }
 
     if (Junction_Right == True and Total_Junction == 5){ // at Junction 1
         Ignore_Turn = Ignore_Turn + 1;
-        MoveForward();
+        moveForward();
     }
 
     if (Junction_Zero == True and Total_Junction == 6 ) { // at Junction 0 return
         Pass_Zero = Pass_Zero + 1;
         TurnLeft(angles = 90);
-        MoveForward();
+        moveForward();
     }
 
     if (Junction_Zero == True and Total_Junction == 6 ) { // at the starting point
@@ -135,17 +135,17 @@ if(Blocks == 0){
         else{
             TurnLeft(angles = 90);
         }
-        MoveForward();
+        moveForward();
     }
 
     if (Junction_Five == True and Total_Junction == 7 ) { // at one of those colorful boxes
         Total_Junction = Total_Junction + 1;
-        MoveForward();
+        moveForward();
         delay(100);
         Stop();
         Reverse(delay = 2000);
         TurnLeft(angles = 180);
-        MoveForward();
+        moveForward();
     }
 
     if (Junction_Five == True and Total_Junction == 8 ) { // back in origin

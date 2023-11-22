@@ -5,7 +5,7 @@ int Block(){
   // Flashes the LED light
   // Clamps the clamp 
 
-  Magnetic = digitalRead(MagInputPin);
+  Magnetic = digitalRead(magInputPin);
 
   float block_distance;
 

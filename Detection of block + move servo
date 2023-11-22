@@ -1,7 +1,7 @@
 #include <Servo.h>
 int redPin = 7; // choose the pin for the red LED
 int greenPin = 8; // choose the pin for the green LED
-int MagInputPin = 10;
+int magInputPin = 10;
 int val = 0; // variable for reading the pin status
 int counter = 0;
 int ultrapin = A3;
@@ -14,7 +14,7 @@ int Magnetic = 0;
 void setup() {
 pinMode(redPin, OUTPUT); // declare LED as output
 pinMode(greenPin, OUTPUT); // declare LED as output
-pinMode(MagInputPin, INPUT); // declare magnetic sensor as input
+pinMode(magInputPin, INPUT); // declare magnetic sensor as input
 myservo.attach(9);
 
 }
@@ -47,7 +47,7 @@ void loop (){
 
         //Magnet lights
         if (counter == 0){
-        Magnetic = digitalRead(MagInputPin); // read input value
+        Magnetic = digitalRead(magInputPin); // read input value
     
 
         if (Magnetic == HIGH) { // check if the input is HIGH

@@ -20,11 +20,11 @@
 //      White for illuminating the line-sensors
 
 
-int leftlinesensorPin = 2; 
-int rightlinesensorPin = 3; 
-int centerlinesensorPin_left = 4;
-int centerlinesensorPin_right = 5;
-int MagInputPin = 6;
+int leftLineSensorPin = 2; 
+int rightLineSensorPin = 3; 
+int centerLineSensorPin_Left = 4;
+int centerLineSensorPin_Right = 5;
+int magInputPin = 6;
 int sensityPin = A3;
 int greenLEDpin = 7;
 int redLEDpin = 8;
@@ -48,10 +48,10 @@ int Total_Junction = 0;
 int angles;
 int speed;
 
-int valLeft = digitalRead(leftlinesensorPin); // read left input value
-int valRight = digitalRead(rightlinesensorPin); // read right input value
-int valCenter_left = digitalRead(centerlinesensorPin_left); 
-int valCenter_right = digitalRead(centerlinesensorPin_right); 
+int valLeft = digitalRead(leftLineSensorPin); // read left input value
+int valRight = digitalRead(rightLineSensorPin); // read right input value
+int valCenter_left = digitalRead(centerLineSensorPin_Left); 
+int valCenter_right = digitalRead(centerLineSensorPin_Right); 
 float sensity_t = analogRead(sensityPin);
 float dist_t;
 */
@@ -60,8 +60,8 @@ float dist_t;
 int LineTracking(){
 
 
-int valCenter_left = digitalRead(centerlinesensorPin_left); 
-int valCenter_right = digitalRead(centerlinesensorPin_right); 
+int valCenter_left = digitalRead(centerLineSensorPin_Left); 
+int valCenter_right = digitalRead(centerLineSensorPin_Right); 
 int speed = 180;
 
   
@@ -101,10 +101,10 @@ else if (valCenter_left == LOW && valCenter_right == HIGH) {
 
 
 int LineTrackingandTurning(){
-  int valLeft = digitalRead(leftlinesensorPin);
-  int valRight = digitalRead(rightlinesensorPin); // read right input value
-  int valCenter_left = digitalRead(centerlinesensorPin_left); 
-  int valCenter_right = digitalRead(centerlinesensorPin_right); 
+  int valLeft = digitalRead(leftLineSensorPin);
+  int valRight = digitalRead(rightLineSensorPin); // read right input value
+  int valCenter_left = digitalRead(centerLineSensorPin_Left); 
+  int valCenter_right = digitalRead(centerLineSensorPin_Right); 
   float sensity_t = analogRead(sensityPin);
   int speed = 180;
 
@@ -182,9 +182,9 @@ int MoveForward(){
 
 int TurnLeft (){
 
-  int valCenter_left = digitalRead(centerlinesensorPin_left); 
-  int valCenter_right = digitalRead(centerlinesensorPin_right); 
-  int valLeft = digitalRead(leftlinesensorPin);
+  int valCenter_left = digitalRead(centerLineSensorPin_Left); 
+  int valCenter_right = digitalRead(centerLineSensorPin_Right); 
+  int valLeft = digitalRead(leftLineSensorPin);
   int corner_speed = 120;
   int speed = 180;
 
@@ -194,14 +194,14 @@ int TurnLeft (){
   Motor_R->setSpeed(corner_speed);
   delay(1000);
 
-  valCenter_left = digitalRead(centerlinesensorPin_left);
-  valCenter_right = digitalRead(centerlinesensorPin_right); 
-  valLeft = digitalRead(leftlinesensorPin); 
+  valCenter_left = digitalRead(centerLineSensorPin_Left);
+  valCenter_right = digitalRead(centerLineSensorPin_Right); 
+  valLeft = digitalRead(leftLineSensorPin); 
 
   while ((valCenter_left == LOW && valCenter_right == LOW) || valLeft == LOW) {
-    valCenter_left = digitalRead(centerlinesensorPin_left); 
-    valCenter_right = digitalRead(centerlinesensorPin_right);
-    valLeft = digitalRead(leftlinesensorPin); 
+    valCenter_left = digitalRead(centerLineSensorPin_Left); 
+    valCenter_right = digitalRead(centerLineSensorPin_Right);
+    valLeft = digitalRead(leftLineSensorPin); 
     Motor_L->run(BACKWARD);
     Motor_R->run(FORWARD);
     Motor_L->setSpeed(corner_speed); 
@@ -215,9 +215,9 @@ int TurnLeft (){
 }
 
 int TurnRight (){
-    int valCenter_left = digitalRead(centerlinesensorPin_left); 
-    int valCenter_right = digitalRead(centerlinesensorPin_right); 
-    int valRight = digitalRead(rightlinesensorPin);
+    int valCenter_left = digitalRead(centerLineSensorPin_Left); 
+    int valCenter_right = digitalRead(centerLineSensorPin_Right); 
+    int valRight = digitalRead(rightLineSensorPin);
     int corner_speed = 120;
     int speed = 180;
 
@@ -227,14 +227,14 @@ int TurnRight (){
     Motor_R->setSpeed(corner_speed);
     delay(1000);
 
-    valCenter_left = digitalRead(centerlinesensorPin_left);
-    valCenter_right = digitalRead(centerlinesensorPin_right); 
-    valRight = digitalRead(rightlinesensorPin); 
+    valCenter_left = digitalRead(centerLineSensorPin_Left);
+    valCenter_right = digitalRead(centerLineSensorPin_Right); 
+    valRight = digitalRead(rightLineSensorPin); 
 
     while ((valCenter_left == LOW && valCenter_right == LOW) || valRight == LOW) {
-      valCenter_left = digitalRead(centerlinesensorPin_left); 
-      valCenter_right = digitalRead(centerlinesensorPin_right);
-      valRight = digitalRead(rightlinesensorPin); 
+      valCenter_left = digitalRead(centerLineSensorPin_Left); 
+      valCenter_right = digitalRead(centerLineSensorPin_Right);
+      valRight = digitalRead(rightLineSensorPin); 
       Motor_L->run(FORWARD);
       Motor_R->run(BACKWARD);
       Motor_L->setSpeed(corner_speed); 
@@ -268,7 +268,7 @@ void Block (void){
   // Flashes the LED light
   // Clamps the clamp 
 
-  Magnetic = digitalRead(MagInputPin);
+  Magnetic = digitalRead(magInputPin);
 
   float block_distance;
 
@@ -364,12 +364,12 @@ void setup() {
   Motor_R->run(RELEASE);
   Motor_L->run(RELEASE);
 
-  pinMode(leftlinesensorPin, INPUT);
-  pinMode(rightlinesensorPin, INPUT);
-  pinMode(centerlinesensorPin_left, INPUT);
-  pinMode(centerlinesensorPin_right, INPUT);
+  pinMode(leftLineSensorPin, INPUT);
+  pinMode(rightLineSensorPin, INPUT);
+  pinMode(centerLineSensorPin_Left, INPUT);
+  pinMode(centerLineSensorPin_Right, INPUT);
 
-  pinMode (MagInputPin, INPUT);
+  pinMode (magInputPin, INPUT);
   pinMode (sensityPin, INPUT) ;
   pinMode (greenLEDpin, OUTPUT);
   pinMode (redLEDpin, OUTPUT);
@@ -391,10 +391,10 @@ void loop(){
   int speed = 180;
 
 
-  int valLeft = digitalRead(leftlinesensorPin); // read left input value
-  int valRight = digitalRead(rightlinesensorPin); // read right input value
-  int valCenter_left = digitalRead(centerlinesensorPin_left); 
-  int valCenter_right = digitalRead(centerlinesensorPin_right); 
+  int valLeft = digitalRead(leftLineSensorPin); // read left input value
+  int valRight = digitalRead(rightLineSensorPin); // read right input value
+  int valCenter_left = digitalRead(centerLineSensorPin_Left); 
+  int valCenter_right = digitalRead(centerLineSensorPin_Right); 
   float sensity_t = analogRead(sensityPin);
   
 

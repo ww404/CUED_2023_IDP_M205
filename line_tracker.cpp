@@ -12,8 +12,8 @@ Adafruit_DCMotor *Motor_R = AFMS.getMotor(2);
 
 // Function: track white lines and turn or keep following the line when there is a intersection
 int led = 2;
-int leftlinesensorPin = 3; // Connect left line sensor to input pin 2
-int rightlinesensorPin = 4; // Connect right line sensor to input pin 3
+int leftLineSensorPin = 3; // Connect left line sensor to input pin 2
+int rightLineSensorPin = 4; // Connect right line sensor to input pin 3
 int centerlinesensorPin = 5;
 
 
@@ -31,7 +31,7 @@ void TurnLeft (bool left){
     delay(10);
 }
 
-void MoveForward (bool stop){
+void moveForward (bool stop){
     while (!stop) {
         // motor speeds not corrected for the different running speeds on the motors on the current prototype (#1)
 
@@ -48,8 +48,8 @@ void setup() {
 
 // setup for line_sensors
 Serial.begin(9600); // Init the serial port
-pinMode(leftlinesensorPin, INPUT); // declares left linesensor as an input
-pinMode(rightlinesensorPin, INPUT); // declares right linesensor as an input
+pinMode(leftLineSensorPin, INPUT); // declares left linesensor as an input
+pinMode(rightLineSensorPin, INPUT); // declares right linesensor as an input
 pinMode(centerlinesensorPin, INPUT); 
 pinMode(led, OUTPUT);
 
@@ -89,8 +89,8 @@ void loop(){
 // Also correct for the previous change made witht regard to sensor input by removing the _1 from both "active sensors"
 
 digitalWrite(led, HIGH);
-int valLeft_1 = digitalRead(leftlinesensorPin); // read left input value
-int valRight_1 = digitalRead(rightlinesensorPin); // read right input value
+int valLeft_1 = digitalRead(leftLineSensorPin); // read left input value
+int valRight_1 = digitalRead(rightLineSensorPin); // read right input value
 int valCenter = digitalRead(centerlinesensorPin); 
 
 if (valCenter == HIGH){

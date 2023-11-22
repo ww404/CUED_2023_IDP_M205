@@ -16,11 +16,11 @@
 //      Blue for indicating moving
 //      White for illuminating the line-sensors
 
-int leftlinesensorPin = 2; 
-int rightlinesensorPin = 3; 
-int centerlinesensorPin_left = 4;
-int centerlinesensorPin_right = 5;
-int MagInputPin = 6;
+int leftLineSensorPin = 2; 
+int rightLineSensorPin = 3; 
+int centerLineSensorPin_Left = 4;
+int centerLineSensorPin_Right = 5;
+int magInputPin = 6;
 int ultrapin = A3;
 int greenLEDpin = 7;
 int redLEDpin = 8;
@@ -58,11 +58,11 @@ void setup() {
   myMotor->run(RELEASE);
   myOtherMotor->run(RELEASE);
 
-  pinMode(leftlinesensorPin , INPUT); 
-  pinMode(rightlinesensorPin, INPUT); 
-  pinMode(centerlinesensorPin_left, INPUT);
-  pinMode(centerlinesensorPin_right, INPUT);
-  pinMode(MagInputPin, INPUT);
+  pinMode(leftLineSensorPin , INPUT); 
+  pinMode(rightLineSensorPin, INPUT); 
+  pinMode(centerLineSensorPin_Left, INPUT);
+  pinMode(centerLineSensorPin_Right, INPUT);
+  pinMode(magInputPin, INPUT);
   pinMode(ultrapin, INPUT);
   pinMode(greenLEDpin, OUTPUT);
   pinMode(redLEDpin, OUTPUT);
@@ -75,11 +75,11 @@ void setup() {
 
 
 void loop (){
-int valLeft = digitalRead(leftlinesensorPin); // read left input value
-int valRight = digitalRead(rightlinesensorPin); // read right input value
-int valCenter_left = digitalRead(centerlinesensorPin_left); 
-int valCenter_right = digitalRead(centerlinesensorPin_right); 
-int Magnetic = digitalRead(MagInputPin);
+int valLeft = digitalRead(leftLineSensorPin); // read left input value
+int valRight = digitalRead(rightLineSensorPin); // read right input value
+int valCenter_left = digitalRead(centerLineSensorPin_Left); 
+int valCenter_right = digitalRead(centerLineSensorPin_Right); 
+int Magnetic = digitalRead(magInputPin);
 int distance_detected = analogRead(ultrapin);
 // Actions:
 //      boolean values:
