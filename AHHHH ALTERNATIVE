@@ -145,6 +145,12 @@ void loop(){
   int block_distance = sensity_t * MAX_RANG / ADC_SOLUTION;
   int speed = 180;
   unsigned long currentMillis = millis();
+  bool Found_Block, Magnetic;
+  bool Straight = (valLeft ==0 && valRight == 0);
+  bool Junction_Left = (valLeft == 1 && valRight == 0 && valCenter_left == 1 && valCenter_right == 1);
+  bool Junction_Right =  (valLeft == 0 && valRight == 1 && valCenter_left == 1 && valCenter_right == 1);
+  bool Junction_Zero = (valLeft == 1 && valRight == 1 && valCenter_left == 1 && valCenter_right == 1);
+  bool Junction_Five = (valLeft == 1 && valRight == 1 && valCenter_left == 0 && valCenter_right == 0);
 
 
   // BUTTON PRESS CODE REQUIRED
@@ -271,7 +277,26 @@ void loop(){
       }
 
       else {
-        MoveForward();
+        if (valCenter_left == HIGH && valCenter_right == LOW) {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_L->setSpeed(speed*0.8);
+          Motor_R->setSpeed(speed);
+        } 
+
+        else if (valCenter_left == LOW && valCenter_right == HIGH) {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed*0.8);
+          Motor_L->setSpeed(speed);
+        }  
+  
+        else {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed);
+          Motor_L->setSpeed(speed);
+        }
       }
     }
     Motor_L->run(FORWARD);

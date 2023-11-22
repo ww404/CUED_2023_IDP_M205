@@ -148,6 +148,19 @@ void loop(){
 
   unsigned long currentMillis = millis();
 
+
+
+
+
+
+
+  // BUTTON PRESS CODE REQUIRED
+
+  while (block_distance >= 5 || counter == 1){ //change according to how far forward the mag sensor is compared to the ultrasound 
+    currentMillis = millis();
+    sensity_t = analogRead(sensityPin);
+    block_distance = sensity_t * MAX_RANG / ADC_SOLUTION; 
+    //Serial.println(block_distance);
   if (currentMillis - previousMillis >= interval) {
     // save the last time you blinked the LED
     previousMillis = currentMillis;
@@ -161,25 +174,29 @@ void loop(){
 
     // set the LED with the ledState of the variable:
     digitalWrite(blueLEDpin, ledState);
+    return;
   }
-
-
-
-
-
-  // BUTTON PRESS CODE REQUIRED
-/*
-  while (block_distance >= 5 || counter == 1){ //change according to how far forward the mag sensor is compared to the ultrasound 
-    sensity_t = analogRead(sensityPin);
-    block_distance = sensity_t * MAX_RANG / ADC_SOLUTION; 
-    //Serial.println(block_distance);
-
 
     if (valCenter_left == HIGH && valCenter_right == LOW) {
       Motor_L->run(FORWARD);
       Motor_R->run(FORWARD);  
       Motor_L->setSpeed(speed*0.8);
       Motor_R->setSpeed(speed);
+        if (currentMillis - previousMillis >= interval) {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis;
+
+    // if the LED is off turn it on and vice-versa:
+    if (ledState == LOW) {
+      ledState = HIGH;
+    } else {
+      ledState = LOW;
+    }
+
+    // set the LED with the ledState of the variable:
+    digitalWrite(blueLEDpin, ledState);
+    return;
+  }
       //Again modify the delay as required to achieve a suitable amount of rotation
     } 
 
@@ -188,6 +205,21 @@ void loop(){
       Motor_R->run(FORWARD);  
       Motor_R->setSpeed(speed*0.8);
       Motor_L->setSpeed(speed);
+        if (currentMillis - previousMillis >= interval) {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis;
+
+    // if the LED is off turn it on and vice-versa:
+    if (ledState == LOW) {
+      ledState = HIGH;
+    } else {
+      ledState = LOW;
+    }
+
+    // set the LED with the ledState of the variable:
+    digitalWrite(blueLEDpin, ledState);
+    return;
+  }
       // Same as above
     }  
   
@@ -198,6 +230,21 @@ void loop(){
       Motor_R->run(FORWARD);  
       Motor_R->setSpeed(speed);
       Motor_L->setSpeed(speed);
+        if (currentMillis - previousMillis >= interval) {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis;
+
+    // if the LED is off turn it on and vice-versa:
+    if (ledState == LOW) {
+      ledState = HIGH;
+    } else {
+      ledState = LOW;
+    }
+
+    // set the LED with the ledState of the variable:
+    digitalWrite(blueLEDpin, ledState);
+    return;
+  }
     }
   
 
@@ -206,7 +253,7 @@ void loop(){
   Motor_R->run(FORWARD);  
   Motor_R->setSpeed(0);
   Motor_L->setSpeed(0);
-*/
+
   if (counter == 0){
     counter = 1;
     
