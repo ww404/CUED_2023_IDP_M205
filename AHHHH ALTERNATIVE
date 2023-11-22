@@ -93,6 +93,7 @@
 
 
 int counter = 0;
+int Total_Junction = 0;
 
 void setup() {
   Serial.begin(9600);           // set up Serial library at 9600 bps
@@ -131,30 +132,56 @@ void setup() {
 
 void loop(){
 
+  int Pass_Zero = 0;
+  int Blocks = 0;
+  int Turn_Left_count = 0;
+  int Turn_Right_count = 0;
+  int Ignore_Turn = 0;
+
+  int angles;
+  int speed = 180;
+
+
   int valLeft = digitalRead(leftlinesensorPin); // read left input value
   int valRight = digitalRead(rightlinesensorPin); // read right input value
   int valCenter_left = digitalRead(centerlinesensorPin_left); 
   int valCenter_right = digitalRead(centerlinesensorPin_right); 
-  bool Magnetic = digitalRead(MagInputPin); 
   float sensity_t = analogRead(sensityPin);
-  int block_distance = sensity_t * MAX_RANG / ADC_SOLUTION;
-  int speed = 180;
+  
 
+  // Actions:
+  //      boolean values:
+  bool Found_Block, Magnetic;
+  bool Straight = (valLeft ==0 && valRight == 0);
+  bool Junction_Left = (valLeft == 1 && valRight == 0 && valCenter_left == 1 && valCenter_right == 1);
+  bool Junction_Right =  (valLeft == 0 && valRight == 1 && valCenter_left == 1 && valCenter_right == 1);
+  bool Junction_Zero = (valLeft == 1 && valRight == 1 && valCenter_left == 1 && valCenter_right == 1);
+  bool Junction_Five = (valLeft == 1 && valRight == 1 && valCenter_left == 0 && valCenter_right == 0);
 
-  // BUTTON PRESS CODE REQUIRED
+  // Junctions:
+  // Junction 5 = Turn_Right_count ==0 && Turn_Left_count ==0 && Ignore_Turn == 0 && Junction_Five == true;
+  // Junction 4 = Turn_Right_count ==1 && Turn_Left_count ==0 && Ignore_Turn == 0 && Junction_Right == true;
+  // Junction 3: Turn_Right_count ==1, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == true
+  // Junction 2: Turn_Right_count ==2, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == true
+  // Junction 1: Turn_Right_count ==3, Turn_Left_count ==0, Ignore_Turn == 1 and Junction_Right == true
+
+  // counts
+  // Total_junction = Turn_Left_count + Turn_Right_count + Ignore_Turn + Pass_Zero;
+
+  // What is going to happen IDEALLY:
+
+  // turn on motor
 
   while (block_distance >= 10 || counter == 1){
+  if (Junction_Zero == true && Total_Junction == 0) {
+    Total_Junction = 1;
     sensity_t = analogRead(sensityPin);
     block_distance = sensity_t * MAX_RANG / ADC_SOLUTION; //
-    //Serial.println(block_distance);
-
-
     if (valCenter_left == HIGH && valCenter_right == LOW) {
       Motor_L->run(FORWARD);
       Motor_R->run(FORWARD);  
       Motor_L->setSpeed(speed*0.8);
       Motor_R->setSpeed(speed);
-      //Again modify the delay as required to achieve a suitable amount of rotation
     } 
 
     else if (valCenter_left == LOW && valCenter_right == HIGH) {
@@ -162,41 +189,110 @@ void loop(){
       Motor_R->run(FORWARD);  
       Motor_R->setSpeed(speed*0.8);
       Motor_L->setSpeed(speed);
-      // Same as above
     }  
   
-
-
     else {
       Motor_L->run(FORWARD);
       Motor_R->run(FORWARD);  
       Motor_R->setSpeed(speed);
       Motor_L->setSpeed(speed);
     }
-  
-
   }
-  Motor_L->run(FORWARD);
-  Motor_R->run(FORWARD);  
-  Motor_R->setSpeed(0);
-  Motor_L->setSpeed(0);
+            
+    else if (Junction_Five == true and Total_Junction == 1){ // at Junction 5
+      TurnRight();
+      Total_Junction = 2;
+      //if (Found_Block){
+        //TurnLeft(180);
+        //MoveForward();
+        //delay(2000);
+      //break;
+      //}
+    }
 
-  if (counter == 0){
-    counter = 1;
-    
+    else if (Junction_Right == true and Total_Junction == 2){ // at Junction 4
+        Total_Junction = 3;
+        MoveForward();
+    }
 
-    if (Magnetic == HIGH) { // check if the input is HIGH
-      digitalWrite(redLEDpin, HIGH);
-      delay(6000);
-      digitalWrite(redLEDpin, LOW); // turn red LED on
-      return counter;
-    } 
-      
+    else if (Junction_Right == true and Total_Junction == 3){ // at Junction 3
+        Total_Junction = 4;
+        TurnRight(90, speed);
+        MoveForward();
+    }
+
+    else if (Junction_Right == true and Total_Junction == 4){ // at Junction 2
+        Total_Junction = 5;
+        TurnRight(90, speed);
+        MoveForward();
+    }
+
+    else if (Junction_Right == true and Total_Junction == 5){ // at Junction 1
+        Total_Junction = 6;
+        MoveForward();
+    }
+
+    else if (Junction_Zero == true and Total_Junction == 6 ) { // at Junction 0 return
+        Total_Junction = 7;
+        TurnLeft(90, speed);
+        MoveForward();
+    }
+
+    else if (Junction_Zero == true and Total_Junction == 6 ) { // at the starting point
+        if(Magnetic){
+            TurnRight();
+        }
+        else{
+            TurnLeft();
+        }
+        MoveForward();
+        Total_Junction = 7;
+    }
+
+    else if (Junction_Five == true and Total_Junction == 7 ) { // at one of those colorful boxes
+        Total_Junction = 8;
+        MoveForward();
+        delay(100);
+        Stop();
+        Reverse(speed);
+        delay(2000);
+        TurnLeft(180, speed);
+        MoveForward();
+    }
+
+    else if (Junction_Five == true and Total_Junction == 8 ) { // back in origin
+        if(Magnetic){
+            TurnLeft(90, speed);
+        }
+        else{
+            TurnRight(90, speed);
+        }
+        Blocks = 1;
+    }
+
+
     else {
-      digitalWrite(greenLEDpin, HIGH);
-      delay(6000); 
-      digitalWrite(greenLEDpin, LOW);// turn green LED on
-      return counter;
+    MoveForward();
     }
   }
+    Motor_L->run(FORWARD);
+    Motor_R->run(FORWARD);  
+    Motor_R->setSpeed(0);
+    Motor_L->setSpeed(0);
+
+    if (counter == 0){
+      counter = 1;
+      if (Magnetic == HIGH) { // check if the input is HIGH
+        digitalWrite(redLEDpin, HIGH);
+        delay(6000);
+        digitalWrite(redLEDpin, LOW); // turn red LED on
+        return counter;
+      }   
+      else {
+        digitalWrite(greenLEDpin, HIGH);
+        delay(6000); 
+        digitalWrite(greenLEDpin, LOW);// turn green LED on
+        return counter;
+      }
+    }
 }
