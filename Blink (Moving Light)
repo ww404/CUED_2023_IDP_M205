@@ -1,12 +1,33 @@
-int bluePin = 10;
+int blueLEDpin = 9;
+unsigned long previousMillis = 0;
+const long interval = 250;
+int ledState = LOW;
 
 void setup() {
- pinMode(bluePin, OUTPUT); //declared LED as output
+  // set the digital pin as output:
+  pinMode(blueLEDpin, OUTPUT);
 }
 
 void loop() {
-    digitalWrite(bluePin, HIGH);
-    delay(250);
-    digitalWrite(bluePin, LOW);
-    delay(250);
+  // here is where you'd put code that needs to be running all the time.
+
+  // check to see if it's time to blink the LED; that is, if the difference
+  // between the current time and last time you blinked the LED is bigger than
+  // the interval at which you want to blink the LED.
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - previousMillis >= interval) {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis;
+
+    // if the LED is off turn it on and vice-versa:
+    if (ledState == LOW) {
+      ledState = HIGH;
+    } else {
+      ledState = LOW;
+    }
+
+    // set the LED with the ledState of the variable:
+    digitalWrite(blueLEDpin, ledState);
   }
+}
