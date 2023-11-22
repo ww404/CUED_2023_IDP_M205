@@ -144,6 +144,7 @@ void loop(){
   float sensity_t = analogRead(sensityPin);
   int block_distance = sensity_t * MAX_RANG / ADC_SOLUTION;
   int speed = 180;
+  unsigned long currentMillis = millis();
 
 
   // BUTTON PRESS CODE REQUIRED
@@ -158,6 +159,21 @@ void loop(){
 
   if (button_counter ==1) {
     while (block_distance >= 10 || counter == 1){
+      if (currentMillis - previousMillis >= interval) {
+        // save the last time you blinked the LED
+        previousMillis = currentMillis;
+
+        // if the LED is off turn it on and vice-versa:
+        if (ledState == LOW) {
+          ledState = HIGH;
+        } 
+        else {
+          ledState = LOW;
+        }
+
+        // set the LED with the ledState of the variable:
+        digitalWrite(blueLEDpin, ledState);
+      }
       if (Junction_Zero == true && Total_Junction == 0) {
         Total_Junction = 1;
         sensity_t = analogRead(sensityPin);
