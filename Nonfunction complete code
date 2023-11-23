@@ -1,0 +1,581 @@
+#include <Adafruit_MotorShield.h>
+#define MAX_RANG (520)//the max measurement value of the module is 520cm(a little bit longer than effective max range)
+#define  ADC_SOLUTION (1023.0)
+
+// Pin allocation
+ int leftlinesensorPin = 2; 
+ int rightlinesensorPin = 3; 
+ int centerlinesensorPin_left = 4;
+ int centerlinesensorPin_right = 5;
+ int MagInputPin = 6;
+ int sensityPin = A3;
+ int greenLEDpin = 7;
+ int redLEDpin = 8;
+ int blueLEDpin = 9;
+ int buttonpin = 10;
+
+// Motor setup
+ Adafruit_MotorShield AFMS;
+ Adafruit_DCMotor *Motor_L = AFMS.getMotor(2);
+ Adafruit_DCMotor *Motor_R = AFMS.getMotor(1);
+
+// Turn left and Right
+  
+  int TurnLeft (){
+   int valCenter_left = digitalRead(centerlinesensorPin_left); 
+   int valCenter_right = digitalRead(centerlinesensorPin_right); 
+   int corner_speed = 120;
+   int speed = 180;
+
+   Motor_L->run(BACKWARD);
+   Motor_R->run(FORWARD);
+   Motor_L->setSpeed(corner_speed); 
+   Motor_R->setSpeed(corner_speed);
+   delay(1000);
+
+   valCenter_left = digitalRead(centerlinesensorPin_left);
+   valCenter_right = digitalRead(centerlinesensorPin_right); 
+
+    while (valCenter_right == LOW || valCenter_left == HIGH) { 
+     valCenter_left = digitalRead(centerlinesensorPin_left); 
+     valCenter_right = digitalRead(centerlinesensorPin_right);
+     Motor_L->run(BACKWARD);
+     Motor_R->run(FORWARD);
+     Motor_L->setSpeed(corner_speed); 
+     Motor_R->setSpeed(corner_speed);
+    }
+  
+    while (valCenter_left == LOW || valCenter_right == LOW){
+     valCenter_left = digitalRead(centerlinesensorPin_left); 
+     valCenter_right = digitalRead(centerlinesensorPin_right);
+
+     Motor_L->run(FORWARD);
+     Motor_R->run(FORWARD);  
+     Motor_R->setSpeed(speed*0.4);
+     Motor_L->setSpeed(speed);
+    }
+  }    
+
+
+
+  int TurnRight (){
+    int valCenter_left = digitalRead(centerlinesensorPin_left); 
+    int valCenter_right = digitalRead(centerlinesensorPin_right); 
+    int corner_speed = 120;
+    int speed = 180;
+
+    Motor_L->run(FORWARD);
+    Motor_R->run(BACKWARD);
+    Motor_L->setSpeed(corner_speed); 
+    Motor_R->setSpeed(corner_speed);
+    delay(1000);
+
+    valCenter_left = digitalRead(centerlinesensorPin_left);
+    valCenter_right = digitalRead(centerlinesensorPin_right); 
+
+    while (valCenter_left== LOW || valCenter_right == HIGH) { 
+      valCenter_left = digitalRead(centerlinesensorPin_left); 
+      valCenter_right = digitalRead(centerlinesensorPin_right);
+      Motor_L->run(FORWARD);
+      Motor_R->run(BACKWARD);
+      Motor_L->setSpeed(corner_speed); 
+      Motor_R->setSpeed(corner_speed);
+    }
+  
+    while (valCenter_left == LOW || valCenter_right == LOW){
+      valCenter_left = digitalRead(centerlinesensorPin_left); 
+      valCenter_right = digitalRead(centerlinesensorPin_right);
+      Motor_L->run(FORWARD);
+      Motor_R->run(FORWARD);  
+      Motor_R->setSpeed(speed);
+      Motor_L->setSpeed(speed*0.4);
+    }
+  }
+
+
+int counter = 0;
+int Total_Junction = 0;
+int buttoncounter = 0;
+unsigned long previousMillis = 0;
+const long interval = 250;
+int ledState = LOW;
+int magnetic_counter = 0;
+
+void setup() {
+  Serial.begin(9600);           // set up Serial library at 9600 bps
+  Serial.println("Adafruit Motorshield v2 - DC Motor test!");
+
+  if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
+  // if (!AFMS.begin(1000)) {  // OR with a different frequency, say 1KHz
+    Serial.println("Could not find Motor Shield. Check wiring.");
+    while (1);
+  }
+
+
+
+  // Set the speed to start, from 0 (off) to 255 (max speed)
+  Motor_R->setSpeed(255);
+  Motor_L->setSpeed(255);
+  Motor_R->run(FORWARD);
+  Motor_L->run(FORWARD);
+  // turn on motor
+  Motor_R->run(RELEASE);
+  Motor_L->run(RELEASE);
+
+  pinMode(leftlinesensorPin, INPUT);
+  pinMode(rightlinesensorPin, INPUT);
+  pinMode(centerlinesensorPin_left, INPUT);
+  pinMode(centerlinesensorPin_right, INPUT);
+
+  pinMode (MagInputPin, INPUT);
+  pinMode (sensityPin, INPUT) ;
+  pinMode (greenLEDpin, OUTPUT);
+  pinMode (redLEDpin, OUTPUT);
+  pinMode (blueLEDpin, OUTPUT);
+  pinMode (buttonpin, INPUT);
+  
+
+}
+
+void loop(){
+
+  int valLeft = digitalRead(leftlinesensorPin); // read left input value
+  int valRight = digitalRead(rightlinesensorPin); // read right input value
+  int valCenter_left = digitalRead(centerlinesensorPin_left); 
+  int valCenter_right = digitalRead(centerlinesensorPin_right); 
+  bool Magnetic = digitalRead(MagInputPin); 
+  float sensity_t = analogRead(sensityPin);
+  bool button = digitalRead(buttonpin);
+  int block_distance = sensity_t * MAX_RANG / ADC_SOLUTION;
+  int speed = 180;
+  int time = 500;
+  bool Straight = (valLeft == LOW && valRight == LOW);
+
+  
+  bool Junction_Left = (valLeft == HIGH && valRight == LOW && valCenter_left == HIGH && valCenter_right == HIGH);
+  bool Junction_Right =  (valLeft == LOW && valRight == HIGH && valCenter_left == HIGH && valCenter_right == HIGH);
+  bool Junction_Zero = (valLeft == HIGH && valRight == HIGH && (valCenter_left == HIGH || valCenter_right == HIGH));
+  bool Junction_Five = (valLeft == HIGH && valRight == HIGH && valCenter_left == LOW && valCenter_right == LOW);
+  
+
+  //bool Junction_Left = (valLeft == HIGH || valRight == HIGH);
+  //bool Junction_Right =  (valLeft == HIGH || valRight == HIGH);
+  //bool Junction_Zero = (valLeft == HIGH || valRight == HIGH);
+  //bool Junction_Five = (valLeft == HIGH || valRight == HIGH);
+
+  unsigned long currentMillis = millis();
+
+
+  if (button == HIGH){
+    Motor_L->run(FORWARD);
+    Motor_R->run(FORWARD);  
+    Motor_R->setSpeed(speed);
+    Motor_L->setSpeed(speed);
+    delay (1500);
+    buttoncounter = 1;
+  }
+
+  if (buttoncounter == 1){
+    while (block_distance >= 5 || counter == 1){ //change according to how far forward the mag sensor is compared to the ultrasound 
+      currentMillis = millis();
+      if (currentMillis - previousMillis >= interval) {
+        previousMillis = currentMillis;
+
+        if (ledState == LOW) {
+          ledState = HIGH;
+        } 
+        else {
+          ledState = LOW;
+        }
+
+        // set the LED with the ledState of the variable:
+        digitalWrite(blueLEDpin, ledState);
+        return;
+      }
+
+      if (Junction_Zero == true && Total_Junction == 1) {
+
+        Total_Junction = 2;
+
+        if (valCenter_left == HIGH && valCenter_right == LOW){
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_L->setSpeed(speed*0.8);
+          Motor_R->setSpeed(speed);
+          return;
+        }
+      
+        else if (valCenter_left == LOW && valCenter_right == HIGH) {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed*0.8);
+          Motor_L->setSpeed(speed);
+          return;
+        }
+
+        else {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed);
+          Motor_L->setSpeed(speed);
+          return;
+        }
+        delay (time);
+        return;
+      } 
+
+      Serial.println(Total_Junction);
+
+      if (Junction_Five == true && Total_Junction == 2) {
+        Total_Junction = 3;
+        TurnRight();
+        delay (time);
+        return;
+      }  
+
+
+
+      if (Junction_Right == true && Total_Junction == 2){
+        Total_Junction = 3;
+
+    
+        if (valCenter_left == HIGH && valCenter_right == LOW){
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_L->setSpeed(speed*0.8);
+          Motor_R->setSpeed(speed);
+          return;
+        }
+        
+        else if (valCenter_left == LOW && valCenter_right == HIGH) {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed*0.8);
+          Motor_L->setSpeed(speed);
+          return;
+        }
+  
+        else {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed);
+          Motor_L->setSpeed(speed);
+          return;
+        }
+        delay (time);
+        return;
+      }
+  
+
+      if (Junction_Five == true && Total_Junction == 3){
+        Total_Junction = 4;
+        TurnRight();
+        delay (time);
+        return;
+      }
+
+      if (Junction_Right == true && Total_Junction == 4){
+        Total_Junction = 5;
+        TurnRight();
+        delay (time);
+        return;
+      }
+
+      if (Junction_Right == true && Total_Junction == 5){
+        Total_Junction = 6;
+
+
+        if (valCenter_left == HIGH && valCenter_right == LOW){
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_L->setSpeed(speed*0.8);
+          Motor_R->setSpeed(speed);
+          return;
+        }
+      
+        else if (valCenter_left == LOW && valCenter_right == HIGH) {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed*0.8);
+          Motor_L->setSpeed(speed);
+          return;
+        }
+
+        else {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed);
+          Motor_L->setSpeed(speed);
+          return;
+        }
+        delay (time);
+        return;
+      }
+
+
+
+      if (Junction_Zero == true && Total_Junction == 6){
+       Total_Junction = 7;
+        TurnLeft();
+        delay (time);
+        return;
+      }
+
+
+
+      if (Junction_Five == true && Total_Junction == 7){
+        Total_Junction = 8;
+        if (magnetic_counter == 1){
+          TurnLeft();
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed);
+          Motor_L->setSpeed(speed);
+          delay (4000);
+
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(0);
+          Motor_L->setSpeed(0);
+          delay (2000);
+
+          Motor_L->run(BACKWARD);
+          Motor_R->run(BACKWARD);  
+          Motor_R->setSpeed(speed);
+          Motor_L->setSpeed(speed);
+          delay (4000);
+  
+          // TURN 90 DEGREES
+  
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed);
+          Motor_L->setSpeed(speed);
+          delay (500);
+        
+          counter = 0;
+          magnetic_counter = 0;
+          return;
+        }
+
+        else {
+          TurnRight();
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed);
+          Motor_L->setSpeed(speed);
+          delay (4000);
+
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(0);
+          Motor_L->setSpeed(0);
+          delay (2000);
+
+          Motor_L->run(BACKWARD);
+          Motor_R->run(BACKWARD);  
+          Motor_R->setSpeed(speed);
+          Motor_L->setSpeed(speed);
+          delay (4000);
+
+          // TURN 90 DEGREES
+
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed);
+          Motor_L->setSpeed(speed);
+          delay (500);
+          
+          counter = 0;
+          magnetic_counter = 0;
+          return;
+        }
+        delay (time);
+        return;
+      }
+      
+
+
+      if (Junction_Zero == true && Total_Junction == 8) {
+
+        Total_Junction = 9;
+
+        if (valCenter_left == HIGH && valCenter_right == LOW){
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_L->setSpeed(speed*0.8);
+          Motor_R->setSpeed(speed);
+          return;
+        }
+      
+        else if (valCenter_left == LOW && valCenter_right == HIGH) {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed*0.8);
+          Motor_L->setSpeed(speed);
+          return;
+        }
+
+        else {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed);
+          Motor_L->setSpeed(speed);
+          return;
+        }
+        delay (time);
+        return;
+      } 
+
+
+
+      if (Junction_Five == true && Total_Junction == 9) {
+        Total_Junction = 10;
+       TurnLeft();
+       delay (time);
+       return;
+      }  
+  
+  
+  
+      if (Junction_Right == true && Total_Junction == 10){
+        Total_Junction = 11;
+  
+      
+        if (valCenter_left == HIGH && valCenter_right == LOW){
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_L->setSpeed(speed*0.8);
+          Motor_R->setSpeed(speed);
+          return;
+        }
+        
+        else if (valCenter_left == LOW && valCenter_right == HIGH) {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed*0.8);
+          Motor_L->setSpeed(speed);
+          return;
+        }
+  
+        else {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed);
+          Motor_L->setSpeed(speed);
+          return;
+        }
+        delay (time);
+        return;
+      }
+    
+  
+      if (Junction_Five == true && Total_Junction == 11){
+        Total_Junction = 12;
+        TurnLeft();
+        delay (time);
+        return;
+      }
+
+      if (Junction_Right == true && Total_Junction == 12){
+        Total_Junction = 13;
+        TurnLeft();
+        delay (time);
+        return;
+      }
+  
+      if (Junction_Right == true && Total_Junction == 13){
+        Total_Junction = 14;
+  
+  
+        if (valCenter_left == HIGH && valCenter_right == LOW){
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_L->setSpeed(speed*0.8);
+          Motor_R->setSpeed(speed);
+          return;
+        }
+      
+        else if (valCenter_left == LOW && valCenter_right == HIGH) {
+         Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed*0.8);
+          Motor_L->setSpeed(speed);
+          return;
+        }
+  
+        else {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed);
+          Motor_L->setSpeed(speed);
+          return;
+        }
+        delay (time);
+        return;
+      }
+
+
+
+      if (Junction_Zero == true && Total_Junction == 14){
+        Total_Junction = 7;
+        TurnRight();
+        return;
+      }
+
+
+      if (Straight == true){
+        if (valCenter_left == HIGH && valCenter_right == LOW){
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_L->setSpeed(speed*0.8);
+          Motor_R->setSpeed(speed);
+          return;
+        }
+      
+        else if (valCenter_left == LOW && valCenter_right == HIGH) {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed*0.8);
+          Motor_L->setSpeed(speed);
+          return;
+        }
+
+        else {
+          Motor_L->run(FORWARD);
+          Motor_R->run(FORWARD);  
+          Motor_R->setSpeed(speed);
+          Motor_L->setSpeed(speed);
+          return;
+        }
+        delay (time);
+        return;
+      }
+    }
+    
+    Motor_L->run(FORWARD);
+    Motor_R->run(FORWARD);  
+    Motor_R->setSpeed(0);
+    Motor_L->setSpeed(0);
+
+    if (counter == 0){
+     counter = 1;
+    
+
+      if (Magnetic == HIGH) { // check if the input is HIGH
+        digitalWrite(redLEDpin, HIGH);
+        delay(6000);
+        digitalWrite(redLEDpin, LOW); // turn red LED on
+        magnetic_counter = 1;
+        return counter;
+      } 
+      
+      else {
+        digitalWrite(greenLEDpin, HIGH);
+        delay(6000); 
+        digitalWrite(greenLEDpin, LOW);// turn green LED on
+        return counter;
+      }
+    }
+  }
+}
