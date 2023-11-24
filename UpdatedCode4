@@ -1,0 +1,481 @@
+#include <Adafruit_MotorShield.h>
+#define MAX_RANG (520)//the max measurement value of the module is 520cm(a little bit longer than effective max range)
+#define  ADC_SOLUTION (1023.0)
+
+// Pin allocation
+ int leftlinesensorPin = 2; 
+ int rightlinesensorPin = 3; 
+ int centerlinesensorPin_left = 4;
+ int centerlinesensorPin_right = 5;
+ int MagInputPin = 6;
+ int sensityPin = A3;
+ int greenLEDpin = 7;
+ int redLEDpin = 8;
+ int blueLEDpin = 9;
+ int buttonpin = 10;
+ //Button
+ int buttoncounter = 0 ;
+ int retrivalcounter = 0;
+
+// Motor setup
+ Adafruit_MotorShield AFMS;
+ Adafruit_DCMotor *Motor_L = AFMS.getMotor(2);
+ Adafruit_DCMotor *Motor_R = AFMS.getMotor(1);
+
+//Global variables
+bool pickup = false;
+bool magnetic = false;
+const long interval = 250;
+int ledState = LOW;
+//int Total_Junction = 0;
+bool reachedjunction0 = false;
+unsigned long previousMillis = 0;
+unsigned long currentMillis = millis();
+int speed = 180; //risky = may want to calibrate to speed 
+int corner_speed = 120;
+int junctioncounter = 0;
+
+//Define functions
+//do 4 functions (all difre) 
+//line-tracking code 
+void CorrectRight(){ 
+//if (valCenter_left == HIGH && valCenter_right == LOW) this goes in main loop 
+      Motor_L->run(FORWARD);
+      Motor_R->run(FORWARD);  
+      Motor_L->setSpeed(speed*0.8);
+      Motor_R->setSpeed(speed);
+        if (currentMillis - previousMillis >= interval) {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis;
+    // if the LED is off turn it on and vice-versa:
+    if (ledState == LOW) {
+      ledState = HIGH;
+    } else {
+      ledState = LOW;
+    }
+    // set the LED with the ledState of the variable:
+    digitalWrite(blueLEDpin, ledState);
+    return;
+  }
+      //Again modify the delay as required to achieve a suitable amount of rotation
+    } 
+
+void CorrectLeft() { //for line following
+   // else if (valCenter_left == LOW && valCenter_right == HIGH) {
+      Motor_L->run(FORWARD);
+      Motor_R->run(FORWARD);  
+      Motor_R->setSpeed(speed*0.8); //may have to lower this
+      Motor_L->setSpeed(speed);
+        if (currentMillis - previousMillis >= interval) {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis;
+
+    // if the LED is off turn it on and vice-versa:
+    if (ledState == LOW) {
+      ledState = HIGH;
+    } else {
+      ledState = LOW;
+    }
+
+    // set the LED with the ledState of the variable:
+    digitalWrite(blueLEDpin, ledState);
+    return;
+        }
+  }
+
+  void MoveForward() {
+      Motor_L->run(FORWARD);
+      Motor_R->run(FORWARD);  
+      Motor_R->setSpeed(speed);
+      Motor_L->setSpeed(speed);
+        if (currentMillis - previousMillis >= interval) {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis;
+
+    // if the LED is off turn it on and vice-versa:
+    if (ledState == LOW) {
+      ledState = HIGH;
+    } else {
+      ledState = LOW;
+    }
+
+    // set the LED with the ledState of the variable:
+    digitalWrite(blueLEDpin, ledState);
+    return;
+        }
+  }
+
+void TurnLeft (){
+
+  // int valCenter_left = digitalRead(centerlinesensorPin_left); 
+  // int valCenter_right = digitalRead(centerlinesensorPin_right); 
+  // int valLeft = digitalRead(leftlinesensorPin);
+ 
+  
+
+  // Motor_L->run(BACKWARD);
+  // Motor_R->run(FORWARD);
+  // Motor_L->setSpeed(corner_speed); 
+  // Motor_R->setSpeed(corner_speed);
+  // delay(1500);
+
+
+
+  // while ((digitalRead(centerlinesensorPin_left) == LOW && digitalRead(centerlinesensorPin_right) == LOW) || digitalRead(leftlinesensorPin) == LOW) {
+
+  //   Motor_L->run(BACKWARD);
+  //   Motor_R->run(FORWARD);
+  //   Motor_L->setSpeed(corner_speed); 
+  //   Motor_R->setSpeed(corner_speed);
+
+  int valCenter_left = digitalRead(centerlinesensorPin_left); 
+  int valCenter_right = digitalRead(centerlinesensorPin_right); 
+  int valLeft = digitalRead(leftlinesensorPin);
+   Motor_L->run(BACKWARD);
+   Motor_R->run(FORWARD);
+   Motor_L->setSpeed(corner_speed); 
+   Motor_R->setSpeed(corner_speed);
+   delay(1500);
+
+   valCenter_left = digitalRead(centerlinesensorPin_left);
+    valCenter_right = digitalRead(centerlinesensorPin_right); 
+
+   while (valCenter_right == LOW || valCenter_left == HIGH) { 
+      valCenter_left = digitalRead(centerlinesensorPin_left); 
+      valCenter_right = digitalRead(centerlinesensorPin_right);
+       Motor_L->run(BACKWARD);
+       Motor_R->run(FORWARD);
+       Motor_L->setSpeed(corner_speed); 
+       Motor_R->setSpeed(corner_speed);
+    }
+  
+   while (valCenter_left == LOW || valCenter_right == LOW){
+      valCenter_left = digitalRead(centerlinesensorPin_left); 
+      valCenter_right = digitalRead(centerlinesensorPin_right);
+
+       Motor_L->run(FORWARD);
+       Motor_R->run(FORWARD);  
+      Motor_R->setSpeed(speed*0.4);
+       Motor_L->setSpeed(speed);
+    }
+    
+  }
+
+ 
+      
+
+
+
+void TurnRight (){
+  // int valCenter_left = digitalRead(centerlinesensorPin_left); 
+  // int valCenter_right = digitalRead(centerlinesensorPin_right); 
+  // int valLeft = digitalRead(leftlinesensorPin);
+
+    // Motor_L->run(FORWARD);
+    // Motor_R->run(BACKWARD);
+    // Motor_L->setSpeed(corner_speed); 
+    // Motor_R->setSpeed(corner_speed);
+    // delay(1500);
+
+
+    // while ((digitalRead(centerlinesensorPin_left) == LOW && digitalRead(centerlinesensorPin_right) == LOW) || digitalRead(rightlinesensorPin) == LOW) {
+    
+    //   Motor_L->run(FORWARD);
+    //   Motor_R->run(BACKWARD);
+    //   Motor_L->setSpeed(corner_speed); 
+    //   Motor_R->setSpeed(corner_speed);
+         int valCenter_left = digitalRead(centerlinesensorPin_left); 
+    int valCenter_right = digitalRead(centerlinesensorPin_right); 
+    int corner_speed = 120;
+    int speed = 180;
+
+    Motor_L->run(FORWARD);
+    Motor_R->run(BACKWARD);
+    Motor_L->setSpeed(corner_speed); 
+    Motor_R->setSpeed(corner_speed);
+    delay(1000);
+
+    valCenter_left = digitalRead(centerlinesensorPin_left);
+    valCenter_right = digitalRead(centerlinesensorPin_right); 
+
+    while (valCenter_left== LOW || valCenter_right == HIGH) { 
+      valCenter_left = digitalRead(centerlinesensorPin_left); 
+      valCenter_right = digitalRead(centerlinesensorPin_right);
+      Motor_L->run(FORWARD);
+      Motor_R->run(BACKWARD);
+      Motor_L->setSpeed(corner_speed); 
+      Motor_R->setSpeed(corner_speed);
+    }
+  
+    while (valCenter_left == LOW || valCenter_right == LOW){
+      valCenter_left = digitalRead(centerlinesensorPin_left); 
+      valCenter_right = digitalRead(centerlinesensorPin_right);
+      Motor_L->run(FORWARD);
+      Motor_R->run(FORWARD);  
+      Motor_R->setSpeed(speed);
+      Motor_L->setSpeed(speed*0.4);
+    }
+    }
+    
+
+
+void Stop (){
+    Motor_L->run(FORWARD);
+    Motor_R->run(FORWARD);
+    Motor_L->setSpeed(0); 
+    Motor_R->setSpeed(0);
+}
+
+void Reverse (int speed){
+    Motor_L->run(BACKWARD);
+    Motor_R->run(BACKWARD);
+    Motor_L->setSpeed(speed);
+    Motor_R->setSpeed(speed);
+
+
+}
+
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);           // set up Serial library at 9600 bps
+  Serial.println("Adafruit Motorshield v2 - DC Motor test!");
+
+  if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
+  // if (!AFMS.begin(1000)) {  // OR with a different frequency, say 1KHz
+    Serial.println("Could not find Motor Shield. Check wiring.");
+    while (1);
+      // Set the speed to start, from 0 (off) to 255 (max speed)
+    Motor_R->setSpeed(255);
+    Motor_L->setSpeed(255);
+    Motor_R->run(FORWARD);
+    Motor_L->run(FORWARD);
+    //turn on motor
+    Motor_R->run(RELEASE);
+    Motor_L->run(RELEASE);
+
+    pinMode(leftlinesensorPin, INPUT);
+    pinMode(rightlinesensorPin, INPUT);
+    pinMode(centerlinesensorPin_left, INPUT);
+    pinMode(centerlinesensorPin_right, INPUT);
+
+    pinMode (MagInputPin, INPUT);
+    pinMode (sensityPin, INPUT) ;
+    pinMode (greenLEDpin, OUTPUT);
+    pinMode (redLEDpin, OUTPUT);
+    pinMode (blueLEDpin, OUTPUT);
+    pinMode (buttonpin, INPUT);
+}
+}
+void loop() {
+  // put your main code here, to run repeatedly:
+  //Read sensors, put it here so you don't have to repeatedly code this
+  int button = digitalRead(buttonpin);
+  int valCenter_left = digitalRead(centerlinesensorPin_left); 
+  int valCenter_right = digitalRead(centerlinesensorPin_right); 
+  int valLeft = digitalRead(leftlinesensorPin); // read left input value
+  int valRight = digitalRead(rightlinesensorPin); // read right input value
+  float sensity_t = analogRead(sensityPin);
+  bool Magnetic = digitalRead(MagInputPin);
+  int block_distance = sensity_t * MAX_RANG / ADC_SOLUTION; 
+  unsigned long currentMillis = millis();
+
+  if (button == HIGH){
+    MoveForward();
+    currentMillis = millis();
+    Serial.println(currentMillis);
+    if (currentMillis - previousMillis >= interval) {
+    // save the last time you blinked the LED
+      previousMillis = currentMillis;
+    
+
+    // if the LED is off turn it on and vice-versa:
+      if (ledState == LOW) {
+       ledState = HIGH;
+      } else {
+        ledState = LOW;
+      }
+
+    // set the LED with the ledState of the variable:
+    digitalWrite(blueLEDpin, ledState);
+    }
+    delay(1000);
+    buttoncounter = 1;
+    //junctioncounter = 1;
+    
+    return;
+  }
+
+  
+  //Block Detection
+  if (buttoncounter == 1) {
+  //   currentMillis = millis();
+  //   Serial.println(currentMillis);
+  //   if (currentMillis - previousMillis >= interval) {
+  //   // save the last time you blinked the LED
+  //     previousMillis = currentMillis;
+  //     currentMillis = millis();
+
+  //   // if the LED is off turn it on and vice-versa:
+  //     if (ledState == LOW) {
+  //      ledState = HIGH;
+  //     } else {
+  //       ledState = LOW;
+  //     }
+
+  //   // set the LED with the ledState of the variable:
+  //   digitalWrite(blueLEDpin, ledState);
+  //   }
+  if ((block_distance <= 4) && (!pickup)) {
+    pickup = true;
+     if (Magnetic == HIGH) { // check if the input is HIGH
+      digitalWrite(redLEDpin, HIGH);
+      magnetic = true;
+      Stop();
+      delay(6000);
+      digitalWrite(redLEDpin, LOW); // turn red LED on
+      //willprob need to put a counter in this to make it go a second time ie when counter = 1 and pickup = true
+    return;
+      
+    } 
+    else {
+      digitalWrite(greenLEDpin, HIGH);
+      Stop();
+      delay(6000); 
+      magnetic = false;
+      digitalWrite(greenLEDpin, LOW);// turn green LED on
+    return;
+    }  
+  }
+  
+   
+    
+  
+  //second attempt at junctions
+  
+  
+   if (valLeft == 1 || valRight == 1) {
+      if(junctioncounter == 0) {
+        MoveForward();
+        junctioncounter++ ;
+        delay(200);
+      }
+      else if (junctioncounter == 1) {
+        TurnRight();
+        junctioncounter++ ;
+        MoveForward();
+        delay(200);
+      }
+      else if (junctioncounter == 2) {
+        MoveForward();
+        junctioncounter++ ;
+        delay(200);
+      }
+      else if (junctioncounter == 3) {
+        TurnRight();
+        junctioncounter++ ;
+        MoveForward();
+        delay(200);
+      }
+      else if (junctioncounter == 4) {
+        TurnRight();
+        junctioncounter++ ;
+        MoveForward();
+        delay(200);
+      }
+      else if (junctioncounter == 5) {
+        MoveForward();
+        junctioncounter++ ;
+        delay(200);
+      }
+      else if (junctioncounter == 6) {
+        TurnLeft();
+        junctioncounter++ ;
+        delay (200);
+      }
+      
+   
+
+
+//line following
+  else if (valCenter_left == 1 && valCenter_right == 0){
+    CorrectRight();
+   }
+   else if (valCenter_left == 0 && valCenter_right == 1){
+    CorrectLeft();
+   }
+   else if (junctioncounter == 7 && valCenter_left == 0 && valCenter_right == 0 ){
+    delay(500);
+
+    // if (magnetic == true){
+    //   //add independent turn right code
+    //   Motor_L->run(FORWARD);
+    //   Motor_R->run(BACKWARD);
+    //   Motor_L->setSpeed(corner_speed); 
+    //   Motor_R->setSpeed(corner_speed);
+    //   delay(1200);
+    //   MoveForward();
+    //   if (valCenter_left == 1 || valCenter_right == 1){
+    //   delay(100);
+    //   Reverse(speed);
+    //   }
+    // }
+    // if (magnetic == false){
+    //   //add independent turn left code
+    //   Motor_L->run(BACKWARD);
+    //   Motor_R->run(FORWARD);
+    //   Motor_L->setSpeed(corner_speed); 
+    //   Motor_R->setSpeed(corner_speed);
+    //   delay(1500);
+    //   MoveForward();
+    //   delay(1500);
+    //   while(retrivalcounter == 0 && valCenter_left == 0 || valCenter_right == 0){
+    //     valCenter_left = digitalRead(centerlinesensorPin_left); 
+    //     valCenter_right = digitalRead(centerlinesensorPin_right); 
+    //     MoveForward();
+    //     retrivalcounter++;
+    //   }
+    //   delay(200);
+    //   //Move backwards out of coloured box
+    //     Motor_L->run(BACKWARD);
+    //     Motor_R->run(BACKWARD);
+    //     Motor_L->setSpeed(speed); 
+    //     Motor_R->setSpeed(speed);
+
+    //   delay(2000);
+    //   //countinue out of box to white box
+    //   while(retrivalcounter == 1 && valCenter_left == 0 || valCenter_right == 0){
+    //     valCenter_left = digitalRead(centerlinesensorPin_left); 
+    //     valCenter_right = digitalRead(centerlinesensorPin_right); 
+    //     Motor_L->run(BACKWARD);
+    //     Motor_R->run(BACKWARD);
+    //     Motor_L->setSpeed(speed); 
+    //     Motor_R->setSpeed(speed);
+    //     retrivalcounter++;
+    //   }
+        
+      //}
+   }
+   }
+   else{
+    MoveForward();
+
+
+   }
+   
+
+
+ //Serial.println(block_distance);
+   return;
+   
+}
+}
+
+   
+
+   
+   
+
+
+  
+
