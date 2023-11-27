@@ -1,0 +1,60 @@
+ if (valLeft == 1 || valRight == 1) {
+      if(junctioncounter == 8) {
+        MoveForward();
+        junctioncounter++ ;
+        delay(200);
+      }
+      else if (junctioncounter == 9) {
+        TurnLeft();
+        junctioncounter++ ;
+        MoveForward();
+        delay(200);
+      }
+      else if (junctioncounter == 10) {
+        MoveForward();
+        junctioncounter++ ;
+        delay(200);
+      }
+      else if (junctioncounter == 11) {
+        TurnLeft();
+        junctioncounter++ ;
+        MoveForward();
+        delay(200);
+      }
+      else if (junctioncounter == 12) {
+        TurnLeft();
+        junctioncounter++ ;
+        MoveForward();
+        delay(200);
+      }
+      else if (junctioncounter == 13) {
+        MoveForward();
+        junctioncounter++ ;
+        delay(200);
+      }
+      else if (junctioncounter == 14){
+        TurnRight();
+        junctioncounter++;
+        MoveForward();
+        delay(200);
+      }
+     
+      }
+      }
+   
+
+
+//line following
+  else if (valCenter_left == 1 && valCenter_right == 0){
+    CorrectRight();
+   }
+   else if (valCenter_left == 0 && valCenter_right == 1){
+    CorrectLeft();
+   }
+   else if (junctioncounter == 15 && valCenter_left == 0 && valCenter_right == 0){
+    delay(500);
+   }
+   
+   else{
+    MoveForward();
+//add in code after bram uploads
