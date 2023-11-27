@@ -37,7 +37,7 @@ int ledState = LOW;
 int junctioncounter = 0;
 bool reachedJunction0 = false;
 const int speed = 180; // risky = may want to calibrate to speed
-const int slowerSpeed = (int) speed / 1.7;
+const int slowerSpeed = (int) speed / 2;
 const int corner_speed = 120;
 
 void CorrectRight()
