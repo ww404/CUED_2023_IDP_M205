@@ -1,20 +1,22 @@
-#include <Adafruit_MotorShield.h>
+#include <Adafruit_MotorShield.h> // FORWARD = 1; BACKWARD = 2
 #define MAX_RANG (520) // the max measurement value of the module is 520cm(a little bit longer than effective max range)
 #define ADC_SOLUTION (1023.0)
 
 // Pin allocation
-const int fllsPin = 2;   // far left line sensor
-const int frlsPin = 3;   // far right ls
-const int cllsPin = 4;  // centre left ls
-const int crlsPin = 5;  // centre right ls
-const int magPin = 6;   // Hall effect sensor
-const int usPin = A3;   // Ultrasonic
+const int fllsPin = 2; // far left line sensor
+const int frlsPin = 3; // far right ls
+const int cllsPin = 4; // centre left ls
+const int crlsPin = 5; // centre right ls
+const int magPin = 6;  // Hall effect sensor
+const int usPin = A3;  // Ultrasonic
 const int greenLedPin = 7;
 const int redLedPin = 8;
 const int blueLedPin = 9;
 const int buttonPin = 10;
 
 int retrivalcounter = 0;
+int buttonCounter;
+int alignCount = 0;
 
 // Motor setup
 Adafruit_MotorShield AFMS;
@@ -35,8 +37,8 @@ int ledState = LOW;
 int junctioncounter = 0;
 bool reachedJunction0 = false;
 const int speed = 180; // risky = may want to calibrate to speed
+const int slowerSpeed = (int) speed / 1.7;
 const int corner_speed = 120;
-
 
 void CorrectRight()
 {
@@ -73,7 +75,7 @@ void CorrectLeft()
   }
 }
 
-void MoveForward()
+void MoveForward(int speed = speed)
 {
   Motor_L->run(FORWARD);
   Motor_R->run(FORWARD);
@@ -87,7 +89,6 @@ void MoveForward()
     // if the LED is off turn it on and vice-versa:
     ledState = !ledState;
 
-
     // set the LED with the ledState of the variable:
     digitalWrite(blueLedPin, ledState);
     return;
@@ -96,32 +97,32 @@ void MoveForward()
 
 void TurnLeft()
 {
-  int valCenter_left = digitalRead(cllsPin);
-  int valCenter_right = digitalRead(crlsPin);
-  int valLeft = digitalRead(fllsPin);
+  int cllsVal = digitalRead(cllsPin);
+  int crlsVal = digitalRead(crlsPin);
+  int fllsVal = digitalRead(fllsPin);
   Motor_L->run(BACKWARD);
   Motor_R->run(FORWARD);
   Motor_L->setSpeed(corner_speed);
   Motor_R->setSpeed(corner_speed);
   delay(1500);
 
-  valCenter_left = digitalRead(cllsPin);
-  valCenter_right = digitalRead(crlsPin);
+  cllsVal = digitalRead(cllsPin);
+  crlsVal = digitalRead(crlsPin);
 
-  while (valCenter_right == LOW || valCenter_left == HIGH)
+  while (crlsVal == LOW || cllsVal == HIGH)
   {
-    valCenter_left = digitalRead(cllsPin);
-    valCenter_right = digitalRead(crlsPin);
+    cllsVal = digitalRead(cllsPin);
+    crlsVal = digitalRead(crlsPin);
     Motor_L->run(BACKWARD);
     Motor_R->run(FORWARD);
     Motor_L->setSpeed(corner_speed);
     Motor_R->setSpeed(corner_speed);
   }
 
-  while (valCenter_left == LOW || valCenter_right == LOW)
+  while (cllsVal == LOW || crlsVal == LOW)
   {
-    valCenter_left = digitalRead(cllsPin);
-    valCenter_right = digitalRead(crlsPin);
+    cllsVal = digitalRead(cllsPin);
+    crlsVal = digitalRead(crlsPin);
 
     Motor_L->run(FORWARD);
     Motor_R->run(FORWARD);
@@ -132,8 +133,8 @@ void TurnLeft()
 
 void TurnRight()
 {
-  int valCenter_left = digitalRead(cllsPin);
-  int valCenter_right = digitalRead(crlsPin);
+  int cllsVal = digitalRead(cllsPin);
+  int crlsVal = digitalRead(crlsPin);
   int corner_speed = 120;
   int speed = 180;
 
@@ -143,23 +144,23 @@ void TurnRight()
   Motor_R->setSpeed(corner_speed);
   delay(1000);
 
-  valCenter_left = digitalRead(cllsPin);
-  valCenter_right = digitalRead(crlsPin);
+  cllsVal = digitalRead(cllsPin);
+  crlsVal = digitalRead(crlsPin);
 
-  while (valCenter_left == LOW || valCenter_right == HIGH)
+  while (cllsVal == LOW || crlsVal == HIGH)
   {
-    valCenter_left = digitalRead(cllsPin);
-    valCenter_right = digitalRead(crlsPin);
+    cllsVal = digitalRead(cllsPin);
+    crlsVal = digitalRead(crlsPin);
     Motor_L->run(FORWARD);
     Motor_R->run(BACKWARD);
     Motor_L->setSpeed(corner_speed);
     Motor_R->setSpeed(corner_speed);
   }
 
-  while (valCenter_left == LOW || valCenter_right == LOW)
+  while (cllsVal == LOW || crlsVal == LOW)
   {
-    valCenter_left = digitalRead(cllsPin);
-    valCenter_right = digitalRead(crlsPin);
+    cllsVal = digitalRead(cllsPin);
+    crlsVal = digitalRead(crlsPin);
     Motor_L->run(FORWARD);
     Motor_R->run(FORWARD);
     Motor_R->setSpeed(speed);
@@ -167,23 +168,41 @@ void TurnRight()
   }
 }
 
-void Stop()
+void alignTurn(int turnTime)  // turn right if turnTime < 0, vice versa
 {
-  Motor_L->run(FORWARD);
-  Motor_R->run(FORWARD);
-  Motor_L->setSpeed(0);
-  Motor_R->setSpeed(0);
+  // Private variables declaration
+  int ldir = 1; // left motor direction
+  int rdir = 0; // right motor direction
+
+  reverse(slowerSpeed);
+  delay(70);
+  stop();
+  if (turnTime == 0) {return;}  // return if turntime == 0.
+  ldir = 1 + (turnTime > 0);
+  rdir = 1 + (turnTime < 0);
+  Motor_L->run(ldir);
+  Motor_R->run(rdir);
+  delay(abs(turnTime));
+  stop();
+
+  // Reset the speeds
+  Motor_L->setSpeed(speed);
+  Motor_R->setSpeed(speed);
 }
 
-void Reverse(int speed)
+void stop()
+{
+  Motor_L->run(BRAKE);
+  Motor_R->run(BRAKE);
+}
+
+void reverse(int speed)
 {
   Motor_L->run(BACKWARD);
   Motor_R->run(BACKWARD);
   Motor_L->setSpeed(speed);
   Motor_R->setSpeed(speed);
 }
-
-
 
 void setup()
 {
@@ -214,21 +233,23 @@ void setup()
     pinMode(greenLedPin, OUTPUT);
     pinMode(redLedPin, OUTPUT);
     pinMode(blueLedPin, OUTPUT);
-    pinMode(buttonpin, INPUT);
+    pinMode(buttonPin, INPUT);
   }
 }
+
+
 void loop()
 {
   // put your main code here, to run repeatedly:
   // Read sensors, put it here so you don't have to repeatedly code this
-  int button = digitalRead(buttonpin);
-  int valCenter_left = digitalRead(cllsPin);
-  int valCenter_right = digitalRead(crlsPin);
-  int valLeft = digitalRead(fllsPin);   // read left input value
-  int valRight = digitalRead(frlsPin); // read right input value
-  float sensity_t = analogRead(usPin);
-  bool Magnetic = digitalRead(magPin);
-  int block_distance = sensity_t * MAX_RANG / ADC_SOLUTION;
+  int button = digitalRead(buttonPin);
+  int cllsVal = digitalRead(cllsPin);
+  int crlsVal = digitalRead(crlsPin);
+  int fllsVal = digitalRead(fllsPin); // read left input value
+  int frlsVal = digitalRead(frlsPin); // read right input value
+  float usVal = analogRead(usPin);
+  bool magDetected = digitalRead(magPin);
+  int usDistance = usVal * MAX_RANG / ADC_SOLUTION;
   unsigned long currentMillis = millis();
 
   if (button == HIGH)
@@ -242,30 +263,29 @@ void loop()
       previousMillis = currentMillis;
 
       // if the LED is off turn it on and vice-versa:
-    ledState = !ledState;
-
+      ledState = !ledState;
 
       // set the LED with the ledState of the variable:
       digitalWrite(blueLedPin, ledState);
     }
     delay(1000);
-    buttoncounter = 1;
+    buttonCounter = 1;
     // junctioncounter = 1;
 
     return;
   }
 
   // Block Detection
-  if (buttoncounter == 1)
+  if (buttonCounter == 1)
   {
-    if ((block_distance <= 4) && (!pickedUp))
+    if ((usDistance <= 4) && (!pickedUp))
     {
       pickedUp = true;
-      if (Magnetic == HIGH)
+      if (magDetected == HIGH)
       { // check if the input is HIGH
         digitalWrite(redLedPin, HIGH);
         magnetic = true;
-        Stop();
+        stop();
         delay(6000);
         digitalWrite(redLedPin, LOW); // turn red LED on
                                       // willprob need to put a counter in this to make it go a second time ie when counter = 1 and pickup = true
@@ -274,7 +294,7 @@ void loop()
       else
       {
         digitalWrite(greenLedPin, HIGH);
-        Stop();
+        stop();
         delay(6000);
         magnetic = false;
         digitalWrite(greenLedPin, LOW); // turn green LED on
@@ -283,75 +303,36 @@ void loop()
     }
 
     // second attempt at junctions
+    Serial.print("fllsVal, frlsVal = ");
+    Serial.print(fllsVal);
+    Serial.println(frlsVal);
+    Serial.println();
 
-    if (valLeft == 1 || valRight == 1)
+
+    // Align with the line
+    if (fllsVal == 0 && frlsVal == 0)
     {
-      if (junctioncounter == 0)
-      {
-        MoveForward();
-        junctioncounter++;
-        delay(200);
-      }
-      else if (junctioncounter == 1)
-      {
-        TurnRight();
-        junctioncounter++;
-        MoveForward();
-        delay(200);
-      }
-      else if (junctioncounter == 2)
-      {
-        MoveForward();
-        junctioncounter++;
-        delay(200);
-      }
-      else if (junctioncounter == 3)
-      {
-        TurnRight();
-        junctioncounter++;
-        MoveForward();
-        delay(200);
-      }
-      else if (junctioncounter == 4)
-      {
-        TurnRight();
-        junctioncounter++;
-        MoveForward();
-        delay(200);
-      }
-      else if (junctioncounter == 5)
-      {
-        MoveForward();
-        junctioncounter++;
-        delay(200);
-      }
-      else if (junctioncounter == 6)
-      {
-        TurnLeft();
-        junctioncounter++;
-        delay(200);
-      }
-
-      // line following
-      else if (valCenter_left == 1 && valCenter_right == 0)
-      {
-        CorrectRight();
-      }
-      else if (valCenter_left == 0 && valCenter_right == 1)
-      {
-        CorrectLeft();
-      }
-      else if (junctioncounter == 7 && valCenter_left == 0 && valCenter_right == 0)
-      {
-        delay(500);
-      }
+      alignCount = 0;
+      MoveForward(slowerSpeed);
+      delay(100);
+      Serial.println("00");
+    } else if (fllsVal == 1 && frlsVal == 0) {
+      alignTurn(250 * pow(0.95, alignCount));
+      Serial.println("10");
+      alignCount ++;
+    } else if (fllsVal == 0 && frlsVal == 1) {
+      alignTurn(-250 * pow(0.95, alignCount));
+      Serial.println("01");
+      alignCount ++;
+    } else {
+      MoveForward(255);
+      delay(5000);
+      Serial.println("11");
+      alignCount = 0;   // reset alignCount
     }
-    else
-    {
-      MoveForward();
-    }
-
-    // Serial.println(block_distance);
-    return;
+  }
+  else
+  {
+    MoveForward();
   }
 }
